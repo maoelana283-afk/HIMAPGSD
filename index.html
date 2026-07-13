@@ -139,7 +139,6 @@
                         <i class="fa-regular fa-clock mr-1"></i> <span id="live-clock-absen">00:00:00</span> 
                     </div>
                 </div>
-                <!-- WARNA DIUBAH: Box Hijau -> Box Pink Light -->
                 <div class="w-20 h-20 bg-pink-50 text-[#db2777] rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-inner">
                     <i class="fa-solid fa-user-check"></i>
                 </div>
@@ -147,7 +146,6 @@
                     <h3 class="font-bold text-xl text-slate-800">Portal Presensi HIMA PGSD</h3>
                     <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">Silakan masuk menggunakan akun kredensial pengurus resmi untuk melakukan penguncian koordinat kehadiran kegiatan.</p>
                 </div>
-                <!-- WARNA DIUBAH: BG Hijau -> BG Pink Deep -->
                 <button onclick="bukaGerbangLogin()" class="w-full bg-[#db2777] hover:bg-[#be185d] text-white font-bold text-xs py-4 rounded-xl shadow-lg shadow-pink-900/10 transition-all flex items-center justify-center gap-2 group">
                     <span>Masuk ke Panel Presensi</span>
                     <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
@@ -162,15 +160,12 @@
                 <form id="form-login-absen" class="space-y-3">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Username Pengurus</label>
-                        <!-- WARNA DIUBAH: Focus ring hijau -> pink -->
                         <input type="text" id="absen-user-input" placeholder="Masukkan username" class="w-full text-xs px-3 py-2.5 border rounded-lg bg-slate-50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#db2777]/20" required>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
-                        <!-- WARNA DIUBAH: Focus ring hijau -> pink -->
                         <input type="password" id="absen-pass-input" placeholder="••••••••" class="w-full text-xs px-3 py-2.5 border rounded-lg bg-slate-50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#db2777]/20" required>
                     </div>
-                    <!-- WARNA DIUBAH: BG Hijau -> BG Pink -->
                     <button type="submit" class="w-full bg-[#db2777] hover:bg-[#be185d] text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">Verifikasi & Masuk</button>
                 </form>
             </div>
@@ -181,7 +176,6 @@
                         <span class="text-pink-600 text-sm"><i id="gps-icon" class="fa-solid fa-location-dot"></i></span>
                         <span id="gps-status-text" class="text-xs font-bold text-pink-700 tracking-wide">Satelit GPS Terkunci</span>
                     </div>
-                    <!-- WARNA DIUBAH: BG Hijau -> BG Pink Medium -->
                     <button id="btn-pindai-gps" class="bg-[#ec4899] hover:bg-[#db2777] text-white text-[11px] font-bold px-4 py-2.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all">
                         <i class="fa-solid fa-satellite-dish text-[10px]"></i> Pindai Koordinat
                     </button>
@@ -208,7 +202,6 @@
                             <span class="text-slate-900 font-bold">WIB</span>
                         </div>
                         <div class="flex items-center space-x-1.5 text-slate-700">
-                            <!-- WARNA DIUBAH: Text blue/emerald -> pink -->
                             <i class="fa-solid fa-location-dot text-pink-600 text-[11px]"></i>
                             <span>Jarak Anda saat ini:</span>
                             <span id="adm-rule-jarak" class="font-bold text-pink-600 underline decoration-dotted">Menghitung...</span>
@@ -235,6 +228,68 @@
                 </form>
             </div>
         </div>
+
+        <script>
+            // State penanda apakah user sudah menekan submit/berhasil absen
+            let statusSudahAbsen = false;
+
+            function paksaKeluarSesiAbsen(alasan) {
+                const mainBox = document.getElementById('absen-main-box');
+                
+                // Eksekusi jika panel presensi utama sedang terbuka aktif
+                if (mainBox && !mainBox.classList.contains('hidden')) {
+                    mainBox.classList.add('hidden');
+                    document.getElementById('absen-login-box').classList.add('hidden');
+                    document.getElementById('absen-welcome-box').classList.remove('hidden');
+                    
+                    const formLogin = document.getElementById('form-login-absen');
+                    if(formLogin) formLogin.reset();
+                    
+                    // Reset status flag
+                    statusSudahAbsen = false;
+
+                    if (alasan === "scroll") {
+                        alert("Sesi presensi Anda ditutup otomatis karena Anda menggulir halaman keluar dari area absensi.");
+                    } else if (alasan === "sukses") {
+                        alert("Sesi presensi ditutup dengan aman. Terima kasih data kehadiran Anda telah terekam.");
+                    }
+                }
+            }
+
+            // 1. EVENT KETIKA BERHASIL SUBMIT ABSEN
+            // (Modifikasi/pastikan fungsi submit form presensi Anda memanggil pemicu ini di bagian akhir suksesnya)
+            document.getElementById('form-absen-online').addEventListener('submit', function(e) {
+                // Catatan: Logika asli simpan database ke Firebase tetap berjalan di modul script utama Anda.
+                // Baris ini disiapkan sebagai pemberitahu sinyal proteksi
+                statusSudahAbsen = true;
+                
+                // Beri jeda 1 detik agar alert bawaan firebase sukses muncul dulu, baru kunci panelnya
+                setTimeout(() => {
+                    paksaKeluarSesiAbsen("sukses");
+                }, 1000);
+            });
+
+            // 2. DETEKSI PENGGUNA SCROLL KELUAR DARI VIEWPORT ABSENSI
+            let timeoutDeteksiScroll;
+            window.addEventListener("scroll", () => {
+                const mainBox = document.getElementById('absen-main-box');
+                
+                if (mainBox && !mainBox.classList.contains('hidden')) {
+                    const areaAbsen = document.getElementById("absen");
+                    const koordinat = areaAbsen.getBoundingClientRect();
+                    
+                    // Kondisi mendeteksi area form absen sudah bergeser total dari layar HP/Laptop
+                    const sudahTerlanjurDigulir = (koordinat.top > window.innerHeight || koordinat.bottom < 0);
+                    
+                    if (sudahTerlanjurDigulir) {
+                        clearTimeout(timeoutDeteksiScroll);
+                        timeoutDeteksiScroll = setTimeout(() => {
+                            paksaKeluarSesiAbsen("scroll");
+                        }, 300); 
+                    }
+                }
+            });
+        </script>
     </section>
 
     <!-- SECTION KEUANGAN (WARNA DIUBAH: Hijau Sage -> Pink Magenta Theme) -->
@@ -829,34 +884,238 @@
                                 </div>
                             </div>
                         `;
-                    } else if(jenis === 'struktur') {
-                        title.innerHTML = '<i class="fa-solid fa-sitemap"></i> Struktur Organisasi Utama';
-                        content.innerHTML = `
-                            <div class="space-y-3">
-                                <p class="font-bold text-slate-800 text-base border-b pb-2 mb-2 flex items-center gap-2">
-                                    <!-- WARNA DIUBAH: Ikon users -> pink -->
-                                    <i class="fa-solid fa-users text-[#db2777]"></i> Badan Pengurus Harian (BPH):
-                                </p>
-                                <div class="grid grid-cols-1 gap-2 text-xs md:text-sm font-semibold">
-                                    <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
-                                        <span class="text-slate-500">Ketua Himpunan</span>
-                                        <span class="text-slate-900 font-bold bg-slate-100 px-3 py-1 rounded-lg">Husni Mubarok</span>
-                                    </div>
-                                    <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
-                                        <span class="text-slate-500">Wakil Ketua Himpunan</span>
-                                        <span class="text-slate-900 font-bold bg-slate-100 px-3 py-1 rounded-lg">Achmad Firas Faishal Firdaos</span>
-                                    </div>
-                                    <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
-                                        <span class="text-slate-500">Sekretaris Umum</span>
-                                        <span class="text-slate-900 font-bold bg-slate-100 px-3 py-1 rounded-lg">Aulia Virgina Nurpita Zahra</span>
-                                    </div>
-                                    <div class="p-3 bg-white border border-slate-200 rounded-xl flex justify-between items-center shadow-sm">
-                                        <span class="text-slate-500">Bendahara Umum</span>
-                                        <span class="text-slate-900 font-bold bg-slate-100 px-3 py-1 rounded-lg">Dede Sri Nur Khotimah</span>
-                                    </div>
+                    } else if (jenis === 'struktur') {
+        title.innerHTML = '<i class="fa-solid fa-users text-slate-750"></i> <span class="text-slate-800 font-bold tracking-wide text-sm">Struktur Organisasi HIMA PGSD</span>';
+        content.innerHTML = `
+            <div class="space-y-6 text-xs md:text-sm p-0.5">
+                
+                <!-- BPH CARD HOLDER -->
+                <div class="space-y-2.5">
+                    <h4 class="text-slate-400 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Badan Pengurus Harian (BPH)</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        
+                        <!-- KETUA -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
+                            <span class="text-slate-600 font-medium">Ketua Himpunan</span>
+                            <span class="text-indigo-700 font-semibold bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg">Husni Mubarok</span>
+                        </div>
+
+                        <!-- WAKIL KETUA -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
+                            <span class="text-slate-600 font-medium">Wakil Ketua Himpunan</span>
+                            <span class="text-blue-700 font-semibold bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-lg">Achmad Firas Faishal Firdaos</span>
+                        </div>
+
+                        <!-- SEKRETARIS -->
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
+                            <span class="text-slate-600 font-medium">Sekretaris Umum</span>
+                            <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Aulia Virgina Nurpita Zahra</span>
+                        </div>
+
+                        <!-- BENDAHARA (DISATUKAN) -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 space-y-2.5 sm:col-span-2">
+                            <div class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Keuangan Himpunan</div>
+                            <div class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-amber-700 text-[10px] font-bold uppercase bg-amber-100/70 border border-amber-200 px-1.5 py-0.5 rounded-md">Bendahara Umum</span>
+                                    <span class="text-slate-800 font-semibold">Dede Sri Nur Khotimah</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-amber-600 text-[10px] font-bold uppercase bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">Wakil Bendahara</span>
+                                    <span class="text-slate-800 font-semibold">Naila Zahrotu Syifa</span>
                                 </div>
                             </div>
-                        `;
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- DIVISI / DEPARTEMEN -->
+                <div class="space-y-4 pt-1">
+                    <h4 class="text-slate-400 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Departemen & Bidang Kerja</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <!-- 1. DEPARTEMEN ORGANISASI & KADERISASI -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-users-gear text-slate-500 text-xs"></i>
+                                    <span>Organisasi & Kaderisasi</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Nathania Kirana Felisha</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Azriel Hilmi G.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Avni Awallatunnisa</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Adriansyah</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Puji Astuti</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Ragil Pratama</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Nurlavianita</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. DEPARTEMEN PENDIDIKAN -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-graduation-cap text-slate-500 text-xs"></i>
+                                    <span>Pendidikan</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Amelia Nurkhasanah</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Alvina Delianti</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Mega Raya Nur K.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Syahlla Rahma N.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Siti Shofyatun N.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Elsa Nabila K.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Gilang Ramadan</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. DEPARTEMEN MEDINFOKOM -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-bullhorn text-slate-500 text-xs"></i>
+                                    <span>Medinfokom</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Firda Alpiyyatur Rohmah</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Nabila Ramadaniah</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Puja Arifah</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Adinda Rahmawati</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Maulana Akbar</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Hafizh Iqbal F.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Dzulfikar M.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. DEPARTEMEN KEAGAMAAN -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-mosque text-slate-500 text-xs"></i>
+                                    <span>Keagamaan</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Hera Haerunnisa</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Naila Maharani</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Devi Permata Sari</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Aas Siti Ainul M.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Mila Kamilatusa'adah</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Siti Nur Azizah</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Rijal Fauzi N.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. DEPARTEMEN MINAT BAKAT -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-palette text-slate-500 text-xs"></i>
+                                    <span>Minat Bakat</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Fany Rahmayati</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Fazri Ramdani</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Rangga Wijaya</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Risma Tri H.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Irma Rahmawati</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Tika Nopiani</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Agisda Hayati</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. DEPARTEMEN KEMITRAAN & PENGABDIAN -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-handshake-angle text-slate-500 text-xs"></i>
+                                    <span>Kemitraan & Pengabdian</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Yayah Nurhayati</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Indah Sri N.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Farel Gumelar</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Alya Melindarani</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Galih Febrian</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Rehan Aditiya R.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Anis Magfiroh R.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. DEPARTEMEN EKRAF -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 md:col-span-2 flex flex-col justify-between">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
+                                    <i class="fa-solid fa-lightbulb text-slate-500 text-xs"></i>
+                                    <span>Ekonomi Kreatif</span>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px]">
+                                    <span class="text-slate-500 font-medium">Ketua Bidang:</span>
+                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Tiara Maulidina</span>
+                                </div>
+                            </div>
+                            <div class="text-[11px] space-y-1.5 pt-2">
+                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-1 gap-x-2 text-slate-700 font-normal">
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Ajeng Tri Hapsari</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Eliya Susanti</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Ratih Aulia R.</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Dwi Lestari</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Satria Anggawijaya</div>
+                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Riyanti Nurhasanah</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        `;
                     }
                 }
             }
