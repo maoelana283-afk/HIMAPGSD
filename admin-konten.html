@@ -254,9 +254,8 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyBoxHJ6xm2bsJZUHZw66jI2hNnd6A13BLg",
             authDomain: "hima-pgsd-web-d82f6.firebaseapp.com",
@@ -733,14 +732,32 @@
         });
 
         document.getElementById('btn-update-keuangan').addEventListener('click', async () => {
-            const pem = parseInt(document.getElementById('inp-pemasukan').value) || 0;
-            const peng = parseInt(document.getElementById('inp-pengeluaran').value) || 0;
-            try {
-                await setDoc(doc(db, "keuangan", "ringkasan"), { pemasukan: pem, pengeluaran: peng, saldo: pem - peng });
-                alert("Sistem Finansial Terupdate!");
-                document.getElementById('form-keuangan').reset();
-            } catch(e) { alert("Gagal: " + e.message); }
+    const pem = parseInt(document.getElementById('inp-pemasukan').value) || 0;
+    const peng = parseInt(document.getElementById('inp-pengeluaran').value) || 0;
+    
+    try {
+        // Menggunakan updateDoc dan increment agar nilai baru menambahkan data lama
+        await updateDoc(doc(db, "keuangan", "ringkasan"), { 
+            pemasukan: increment(pem), 
+            pengeluaran: increment(peng)
         });
+        
+        alert("Data Keuangan Berhasil Ditambahkan (Akumulatif)!");
+        document.getElementById('form-keuangan').reset();
+    } catch(e) { 
+        // Jika dokumen belum ada di database, buat data awal dengan setDoc
+        try {
+            await setDoc(doc(db, "keuangan", "ringkasan"), { 
+                pemasukan: pem, 
+                pengeluaran: peng 
+            });
+            alert("Data Keuangan Awal Berhasil Dibuat!");
+            document.getElementById('form-keuangan').reset();
+        } catch(err) {
+            alert("Gagal memproses data: " + err.message); 
+        }
+    }
+});
     </script>
 </body>
 </html>
