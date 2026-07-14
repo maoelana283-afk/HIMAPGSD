@@ -154,6 +154,28 @@
                     <button type="submit" class="w-full bg-amber-500/80 text-slate-950 font-bold py-2.5 rounded hover:bg-amber-400 transition-colors border border-amber-400/40">Simpan Aturan</button>
                 </div>
             </form>
+
+            <!-- TEMPAT DAFTAR ATURAN ACARA AKTIF -->
+            <div class="pt-4 border-t border-slate-500/20">
+                <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Daftar Aturan Acara Aktif</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border border-slate-600/30">
+                        <thead class="bg-slate-900/60 text-slate-200 border-b border-slate-600/40">
+                            <tr>
+                                <th class="p-2.5 border-r border-slate-600/30">Nama Acara</th>
+                                <th class="p-2.5 border-r border-slate-600/30 w-32">Jam Mulai</th>
+                                <th class="p-2.5 border-r border-slate-600/30">Koordinat</th>
+                                <th class="p-2.5 w-28 text-center">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-list-jadwal" class="bg-slate-950/20">
+                            <tr>
+                                <td colspan="4" class="p-2.5 text-center text-slate-400">Memuat aturan acara...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- INFORMASI KEUANGAN -->
@@ -254,8 +276,8 @@
     </div>
 
     <script type="module">
-     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyBoxHJ6xm2bsJZUHZw66jI2hNnd6A13BLg",
             authDomain: "hima-pgsd-web-d82f6.firebaseapp.com",
@@ -317,7 +339,7 @@ import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, on
             }
         });
 
-        // HANDLER LOGIN
+        // HANDLER LOGIN (HAK AKSES SESUAI IDENTITAS LAMA ANDA)
         document.getElementById('form-login').addEventListener('submit', function(e) {
             e.preventDefault();
             const u = document.getElementById('user-admin').value.trim();
@@ -356,52 +378,15 @@ import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, on
                 document.getElementById('section-absensi').classList.remove('hidden');
                 muatDaftarKontenTabel();
                 muatDaftarAspirasi();
-                muatDaftarAbsensi(); // Panggil fungsi muat absensi
+                
+                // MENGAKTIFKAN LOGIKA BARU DIBAWAH
+                inisialisasiFiturAbsenOtomatis(); 
             }
         }
 
         document.getElementById('btn-logout').addEventListener('click', () => { location.reload(); });
 
-        // ================= FITUR ENGINE ABSENSI (BARU) =================
-        function muatDaftarAbsensi() {
-            onSnapshot(query(collection(db, "presensi"), orderBy("timestamp", "desc")), (snapshot) => {
-                listAbsensiLokal = [];
-                const tbody = document.getElementById('tabel-list-absensi');
-                if(!tbody) return;
-                tbody.innerHTML = "";
-
-                snapshot.forEach((doc) => {
-                    const item = doc.data();
-                    item.id = doc.id;
-                    listAbsensiLokal.push(item);
-                });
-
-                if(listAbsensiLokal.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400">Belum ada peserta yang mengisi absen.</td></tr>`;
-                    return;
-                }
-
-                listAbsensiLokal.forEach((item, index) => {
-                    const wkt = new Date(item.timestamp).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " WIB";
-                    
-                    tbody.innerHTML += `
-                        <tr class="border-b border-slate-700/40 hover:bg-slate-800/20 transition-colors">
-                            <td class="p-3 text-slate-300 font-mono">${wkt}</td>
-                            <td class="p-3 font-semibold text-white">${item.nama}</td>
-                            <td class="p-3 text-slate-300 font-mono">${item.nim}</td>
-                            <td class="p-3 text-slate-300">${item.kelas}</td>
-                            <td class="p-3 text-amber-300 truncate max-w-xs">${item.acara}</td>
-                            <td class="p-3 flex flex-wrap justify-center gap-1.5">
-                                <button onclick="cetakAbsenPeserta(${index})" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-solid fa-print"></i> Cetak</button>
-                                <button onclick="bagikanAbsenPeserta(${index})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-brands fa-whatsapp"></i> Share</button>
-                                <button onclick="hapusAbsenPeserta('${item.id}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-        }
-
+        // ================= FITUR ENGINE ABSENSI (ASLI ANDA) =================
         function cetakAbsenPeserta(idx) {
             const item = listAbsensiLokal[idx];
             const tglFull = new Date(item.timestamp).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) + " WIB";
@@ -709,7 +694,7 @@ import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, on
         async function hapusBerita(id, targetKoleksi) {
             if(confirm("Apakah Anda yakin ingin menghapus data ini dari Firestore Cloud?")) {
                 try {
-                    await deleteDoc(doc(doc, targetKoleksi, id));
+                    await deleteDoc(doc(db, targetKoleksi, id));
                     alert("Konten Berhasil Dihapus!");
                 } catch(e) { alert("Gagal menghapus: " + e.message); }
             }
@@ -732,32 +717,217 @@ import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, on
         });
 
         document.getElementById('btn-update-keuangan').addEventListener('click', async () => {
-    const pem = parseInt(document.getElementById('inp-pemasukan').value) || 0;
-    const peng = parseInt(document.getElementById('inp-pengeluaran').value) || 0;
-    
-    try {
-        // Menggunakan updateDoc dan increment agar nilai baru menambahkan data lama
-        await updateDoc(doc(db, "keuangan", "ringkasan"), { 
-            pemasukan: increment(pem), 
-            pengeluaran: increment(peng)
+            const pem = parseInt(document.getElementById('inp-pemasukan').value) || 0;
+            const peng = parseInt(document.getElementById('inp-pengeluaran').value) || 0;
+            
+            try {
+                await updateDoc(doc(db, "keuangan", "ringkasan"), { 
+                    pemasukan: increment(pem), 
+                    pengeluaran: increment(peng)
+                });
+                alert("Data Keuangan Berhasil Ditambahkan (Akumulatif)!");
+                document.getElementById('form-keuangan').reset();
+            } catch(e) { 
+                try {
+                    await setDoc(doc(db, "keuangan", "ringkasan"), { 
+                        pemasukan: pem, 
+                        pengeluaran: peng 
+                    });
+                    alert("Data Keuangan Awal Berhasil Dibuat!");
+                    document.getElementById('form-keuangan').reset();
+                } catch(err) {
+                    alert("Gagal memproses data: " + err.message); 
+                }
+            }
         });
+
+        // =========================================================================================
+        // FITUR OTOMATISASI BARU: SINKRONISASI LIVE, ARSIP DROPDOWN >24 JAM & MANAJEMEN ATURAN ACARA
+        // =========================================================================================
         
-        alert("Data Keuangan Berhasil Ditambahkan (Akumulatif)!");
-        document.getElementById('form-keuangan').reset();
-    } catch(e) { 
-        // Jika dokumen belum ada di database, buat data awal dengan setDoc
-        try {
-            await setDoc(doc(db, "keuangan", "ringkasan"), { 
-                pemasukan: pem, 
-                pengeluaran: peng 
-            });
-            alert("Data Keuangan Awal Berhasil Dibuat!");
-            document.getElementById('form-keuangan').reset();
-        } catch(err) {
-            alert("Gagal memproses data: " + err.message); 
+        function inisialisasiFiturAbsenOtomatis() {
+            monitorAbsensiLiveDanArsip();
+            monitorJadwalAcaraLive();
         }
-    }
-});
+
+        // 1. LOGIKA MENARIK DATA REALTIME & ARCHIVING >24 JAM BERDASARKAN ACARA MENJADI 1 FILE
+        function monitorAbsensiLiveDanArsip() {
+            const tbodyAbsen = document.getElementById('tabel-list-absensi');
+            if(!tbodyAbsen) return;
+
+            // Membangun elemen dropdown arsip otomatis di dashboard jika belum terpasang
+            let areaArsip = document.getElementById('box-arsip-kegiatan');
+            if (!areaArsip) {
+                areaArsip = document.createElement('div');
+                areaArsip.id = 'box-arsip-kegiatan';
+                areaArsip.className = 'mt-6 pt-4 border-t border-slate-500/20 space-y-2';
+                areaArsip.innerHTML = `
+                    <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-box-archive mr-1.5"></i> Arsip File Absensi (>24 Jam)</h4>
+                    <select id="pilih-arsip-kegiatan" class="w-full p-2.5 bg-slate-900 border border-slate-600/40 text-slate-200 text-xs rounded focus:outline-none focus:border-amber-500/50">
+                        <option value="">-- Pilih Berkas Acara Terarsip --</option>
+                    </select>
+                    <div id="detail-arsip-kegiatan" class="hidden overflow-x-auto mt-2 border border-slate-700/40 rounded bg-slate-950/40 p-2.5 text-xs text-slate-300">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="border-b border-slate-700 text-slate-400 font-bold">
+                                    <th class="p-2">Waktu</th><th class="p-2">Nama Lengkap</th><th class="p-2">NIM</th><th class="p-2">Kelas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-body-arsip-kegiatan"></tbody>
+                        </table>
+                    </div>
+                `;
+                tbodyAbsen.closest('.glass-card').appendChild(areaArsip);
+            }
+
+            // Penarikan data presensi real-time terotomatisasi
+            onSnapshot(query(collection(db, "presensi"), orderBy("timestamp", "desc")), (snapshot) => {
+                listAbsensiLokal = [];
+                tbodyAbsen.innerHTML = "";
+
+                const waktuSekarang = Date.now();
+                const batas24Jam = 24 * 60 * 60 * 1000;
+                const wadahArsipAcara = {}; // Pengelompokan data >24 jam berdasarkan nama acara
+                let adaDataLive = false;
+
+                snapshot.forEach((docSnap) => {
+                    const item = docSnap.data();
+                    item.id = docSnap.id;
+
+                    const umurData = waktuSekarang - item.timestamp;
+
+                    // Jika umur absen sudah lebih dari 24 jam, satukan data kedalam file arsip acara
+                    if (umurData > batas24Jam) {
+                        const namaAcara = item.acara || "Acara Tanpa Nama";
+                        if (!wadahArsipAcara[namaAcara]) wadahArsipAcara[namaAcara] = [];
+                        wadahArsipAcara[namaAcara].push(item);
+                    } else {
+                        // Jika kurang dari 24 jam, tetap tampil di monitoring utama secara terpisah (nama satu-satu)
+                        adaDataLive = true;
+                        listAbsensiLokal.push(item);
+                    }
+                });
+
+                // Tampilkan data live di dalam tabel monitoring
+                if (!adaDataLive) {
+                    tbodyAbsen.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-400 italic">Tidak ada mahasiswa absen dalam 24 jam terakhir.</td></tr>`;
+                } else {
+                    listAbsensiLokal.forEach((item, index) => {
+                        const wkt = new Date(item.timestamp).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + " WIB";
+                        tbodyAbsen.innerHTML += `
+                            <tr class="border-b border-slate-700/40 hover:bg-slate-800/20 transition-colors">
+                                <td class="p-3 text-slate-300 font-mono">${wkt}</td>
+                                <td class="p-3 font-semibold text-white">${item.nama}</td>
+                                <td class="p-3 text-slate-300 font-mono">${item.nim}</td>
+                                <td class="p-3 text-slate-300">${item.kelas}</td>
+                                <td class="p-3 text-amber-300 truncate max-w-xs">${item.acara}</td>
+                                <td class="p-3 flex flex-wrap justify-center gap-1.5">
+                                    <button onclick="cetakAbsenPeserta(${index})" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-solid fa-print"></i> Cetak</button>
+                                    <button onclick="bagikanAbsenPeserta(${index})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-brands fa-whatsapp"></i> Share</button>
+                                    <button onclick="hapusAbsenPeserta('${item.id}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                // Perbarui Dropdown File Arsip secara dinamis
+                const selectArsip = document.getElementById('pilih-arsip-kegiatan');
+                if (selectArsip) {
+                    const nilaiPilihanLama = selectArsip.value;
+                    selectArsip.innerHTML = '<option value="">-- Pilih Berkas Acara Terarsip --</option>';
+                    
+                    Object.keys(wadahArsipAcara).forEach(kegiatan => {
+                        const opsi = document.createElement('option');
+                        opsi.value = kegiatan;
+                        opsi.textContent = `📁 File Acara: ${kegiatan} (${wadahArsipAcara[kegiatan].length} Mahasiswa)`;
+                        selectArsip.appendChild(opsi);
+                    });
+
+                    if (wadahArsipAcara[nilaiPilihanLama]) {
+                        selectArsip.value = nilaiPilihanLama;
+                        muatDetailFileArsip(wadahArsipAcara[nilaiPilihanLama]);
+                    }
+
+                    selectArsip.onchange = function() {
+                        const pilihAcara = this.value;
+                        if (pilihAcara && wadahArsipAcara[pilihAcara]) {
+                            muatDetailFileArsip(wadahArsipAcara[pilihAcara]);
+                        } else {
+                            document.getElementById('detail-arsip-kegiatan').classList.add('hidden');
+                        }
+                    };
+                }
+            });
+        }
+
+        function muatDetailFileArsip(anggotaAcara) {
+            const detailBox = document.getElementById('detail-arsip-kegiatan');
+            const tbodyArsip = document.getElementById('tabel-body-arsip-kegiatan');
+            if(!detailBox || !tbodyArsip) return;
+
+            tbodyArsip.innerHTML = "";
+            anggotaAcara.forEach(mhs => {
+                const wktTeks = new Date(mhs.timestamp).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+                const baris = document.createElement('tr');
+                baris.className = "border-b border-slate-800 text-slate-300";
+                baris.innerHTML = `
+                    <td class="p-2 font-mono text-slate-400">${wktTeks}</td>
+                    <td class="p-2 font-semibold text-white">${mhs.nama}</td>
+                    <td class="p-2 font-mono">${mhs.nim}</td>
+                    <td class="p-2">${mhs.kelas}</td>
+                `;
+                tbodyArsip.appendChild(baris);
+            });
+            detailBox.classList.remove('hidden');
+        }
+
+        // 2. LOGIKA REAL-TIME MONITORING, MEMANTAU, SERTA MENGHAPUS ATURAN JADWAL ACARA
+        var statusJadwalAktif = false;
+        function monitorJadwalAcaraLive() {
+            if(statusJadwalAktif) return;
+            statusJadwalAktif = true;
+
+            const tabelJadwalBody = document.getElementById('tabel-list-jadwal');
+            if(!tabelJadwalBody) return;
+
+            onSnapshot(collection(db, "jadwalAbsen"), (snapshot) => {
+                tabelJadwalBody.innerHTML = "";
+
+                if(snapshot.empty) {
+                    tabelJadwalBody.innerHTML = `<tr><td colspan="4" class="p-2.5 text-center text-slate-400 italic">Belum ada aturan jadwal acara yang aktif.</td></tr>`;
+                    return;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const namaAcara = docSnap.id;
+                    const data = docSnap.data();
+
+                    const baris = document.createElement('tr');
+                    baris.className = "border-b border-slate-600/20 hover:bg-slate-800/20 text-slate-300 transition-colors";
+                    baris.innerHTML = `
+                        <td class="p-2.5 border-r border-slate-600/30 font-semibold text-white">${namaAcara}</td>
+                        <td class="p-2.5 border-r border-slate-600/30 text-amber-400 font-mono">${data.jam || '--:--'} WIB</td>
+                        <td class="p-2.5 border-r border-slate-600/30 text-slate-400 font-mono text-[11px]">${data.lat || '0'}, ${data.lon || '0'}</td>
+                        <td class="p-2.5 text-center">
+                            <button onclick="hapusAturanAcaraSpesifik('${namaAcara}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white text-[10px] px-2 py-0.5 rounded border border-red-500/30 transition-all font-bold">
+                                <i class="fa-solid fa-trash-can"></i> Hapus
+                            </button>
+                        </td>
+                    `;
+                    tabelJadwalBody.appendChild(baris);
+                });
+            });
+        }
+
+        window.hapusAturanAcaraSpesifik = async function(namaAcara) {
+            if(confirm(`Apakah Anda yakin ingin menghapus aturan jadwal untuk "${namaAcara}"?`)) {
+                try {
+                    await deleteDoc(doc(db, "jadwalAbsen", namaAcara));
+                    alert(`Aturan jadwal acara "${namaAcara}" berhasil dihapus!`);
+                } catch(err) { alert("Gagal menghapus aturan acara: " + err.message); }
+            }
+        };
     </script>
 </body>
 </html>
