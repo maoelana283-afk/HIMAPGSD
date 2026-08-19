@@ -544,14 +544,14 @@
         import { getFirestore, collection, addDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBoxHJ6xm2bsJZUHZw66jI2hNnd6A13BLg",
-            authDomain: "hima-pgsd-web-d82f6.firebaseapp.com",
-            projectId: "hima-pgsd-web-d82f6",
-            storageBucket: "hima-pgsd-web-d82f6.firebasestorage.app",
-            messagingSenderId: "708297633100",
-            appId: "1:708297633100:web:e38c5dc566d346f860b3e9",
-            measurementId: "G-NJERSXL2EK"
-        };
+    apiKey: "AIzaSyCoz4qB0dkhJdDIFdCgsi0A_hmfrQpUFS0",
+    authDomain: "himapgsdumk-11157.firebaseapp.com",
+    projectId: "himapgsdumk-11157",
+    storageBucket: "himapgsdumk-11157.firebasestorage.app",
+    messagingSenderId: "585963317074",
+    appId: "1:585963317074:web:2e62292f9db4e41be97c8b",
+    measurementId: "G-B6DV6HTQP6"
+};
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -1167,12 +1167,12 @@
             // WARNA DIUBAH: Text -> pink
             document.getElementById('adm-rule-jarak').innerText = `${Math.round(jarak)}m dari pusat acara`;
 
-            if (jarak <= 400) { 
+            if (jarak <= 500) { 
                 btn.disabled = false; btn.innerText = "Kirim Kehadiran (Masuk Radius)";
                 // WARNA DIUBAH: BG -> pink
                 btn.className = "w-full bg-[#db2777] hover:bg-[#be185d] text-white font-bold text-xs py-4 rounded-xl cursor-pointer transition-all";
             } else {
-                btn.disabled = true; btn.innerText = "Gagal: Jarak Lebih dari 400m!";
+                btn.disabled = true; btn.innerText = "Gagal: Jarak Lebih dari 500m!";
                 btn.className = "w-full bg-rose-600 text-white font-bold text-xs py-4 rounded-xl cursor-not-allowed";
             }
         }
@@ -1199,31 +1199,54 @@
             } catch(err) { alert("Gagal mengirim presensi: " + err.message); }
         });
 
-        // SUBMIT FORM ASPIRASI
-        document.getElementById('form-aspirasi-online').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const opsiRadio = document.querySelector('input[name="opsi_nama"]:checked').value;
-            let nama = "Anonim";
-            if (opsiRadio === 'Tulis') {
-                nama = document.getElementById('aspirasi-nama-user').value || "Anonim";
-            }
-            const kategori = document.getElementById('aspirasi-kategori').value;
-            const pesan = document.getElementById('textaspirasi').value;
+     // SUBMIT FORM ASPIRASI
+document.getElementById('form-aspirasi-online').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-            try {
-                await addDoc(collection(db, "aspirasi"), {
-                    nama: nama,
-                    kategori: kategori,
-                    pesan: pesan,
-                    timestamp: Date.now()
-                });
-                alert("Aspirasi Anda berhasil terkirim ke server Firebase!");
-                document.getElementById('form-aspirasi-online').reset();
-                document.getElementById('char-counter').innerText = "0 / 2000 Karakter";
-                const boxNama = document.getElementById('box-nama-pilihan');
-                boxNama.classList.add('hidden');
-            } catch(e) { alert("Gagal mengirim aspirasi: " + e.message); }
+    // 1. Ambil radio button opsi nama
+    const opsiRadio = document.querySelector('input[name="opsi_nama"]:checked')?.value || 'Anonim';
+    
+    // 2. Tentukan status anonim dan nama pengirim
+    const isAnonim = (opsiRadio !== 'Tulis');
+    let nama = "Anonim";
+    if (!isAnonim) {
+        nama = document.getElementById('aspirasi-nama-user').value.trim() || "Anonim";
+    }
+
+    const kategori = document.getElementById('aspirasi-kategori').value;
+    const pesanAspirasi = document.getElementById('textaspirasi').value.trim();
+
+    // Validasi pesan tidak boleh kosong
+    if (!pesanAspirasi) {
+        alert("Harap isi pesan/saran aspirasi Anda!");
+        return;
+    }
+
+    try {
+        // 3. Kirim ke Firestore dengan struktur field yang dibaca admin
+        await addDoc(collection(db, "aspirasi"), {
+            anonim: isAnonim,       // PENTING: Dibaca admin untuk status anonim (boolean)
+            nama: nama,             // Nama pengirim ("Anonim" atau Input Nama)
+            kategori: kategori,     // Kategori aspirasi
+            isi: pesanAspirasi,     // PENTING: Menggunakan 'isi' agar terbaca di admin.html
+            timestamp: Date.now()   // Waktu pengiriman
         });
+
+        alert("Aspirasi Anda berhasil terkirim ke HIMA PGSD!");
+
+        // 4. Reset Form & Tampilan
+        document.getElementById('form-aspirasi-online').reset();
+        
+        const charCounter = document.getElementById('char-counter');
+        if (charCounter) charCounter.innerText = "0 / 2000 Karakter";
+
+        const boxNama = document.getElementById('box-nama-pilihan');
+        if (boxNama) boxNama.classList.add('hidden');
+
+    } catch (e) {
+        alert("Gagal mengirim aspirasi: " + e.message);
+    }
+});
 
         setInterval(() => {
             const waktu = new Date();
