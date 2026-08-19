@@ -4,1440 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIMA PGSD - Universitas Muhammadiyah Kuningan (Firebase)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-</head>
-<body class="text-slate-800">
-    
-    <nav class="bg-white shadow-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <!-- WARNA DIUBAH: Gradasi Hijau -> Gradasi Pink Premium -->
-            <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-[#db2777] to-pink-500 shadow-sm flex items-center justify-center overflow-hidden">
-                <img src="logo.jpeg" alt="Logo HIMA" class="w-full h-full object-cover rounded-full bg-white" onerror="this.src='https://via.placeholder.com/45x45?text=PGSD'">
-            </div>
-            <div>
-                <!-- WARNA DIUBAH: Text Hijau -> Text Pink Deep -->
-                <div class="font-bold text-lg text-[#db2777] leading-tight">HIMA PGSD</div>
-                <div class="text-[10px] text-slate-500 font-medium tracking-wide">UM KUNINGAN</div>
-            </div>
-        </div>
-        
-        <button onclick="toggleMenuGlobal()" class="text-slate-600 focus:outline-none text-2xl p-2 hover:bg-slate-100 rounded-lg transition-all">
-            <i id="menu-icon-global" class="fa-solid fa-bars"></i>
-        </button>
 
-        <div id="dropdown-menu-global" class="hidden absolute top-full right-6 w-64 bg-white border border-slate-200 shadow-xl rounded-xl py-4 px-6 flex flex-col space-y-4 font-semibold text-slate-600 z-50">
-            <a href="#" onclick="toggleMenuGlobal()"><i class="fa-solid fa-house mr-2"></i>Beranda</a>
-            <a href="javascript:void(0)" onclick="bukaPopup('kabinet')"><i class="fa-solid fa-box-archive mr-2"></i>Kabinet</a>
-            <a href="javascript:void(0)" onclick="bukaPopup('struktur')"><i class="fa-solid fa-sitemap mr-2"></i>Struktur Organisasi</a>
-            <a href="#kegiatan" onclick="toggleMenuGlobal()"><i class="fa-solid fa-newspaper mr-2"></i>Kegiatan</a>
-            <a href="#absen" onclick="toggleMenuGlobal()"><i class="fa-solid fa-user-check mr-2"></i>Absensi Acara</a>
-            <a href="#kas" onclick="toggleMenuGlobal()"><i class="fa-solid fa-wallet mr-2"></i>Informasi Keuangan</a>
-            <a href="javascript:void(0)" onclick="bukaPopup('beasiswa')"><i class="fa-solid fa-graduation-cap mr-2"></i>Beasiswa</a>
-            <a href="javascript:void(0)" onclick="bukaPopup('galeri')"><i class="fa-solid fa-images mr-2"></i>Galeri</a>
-            <a href="#aspirasi" onclick="toggleMenuGlobal()"><i class="fa-solid fa-comments mr-2"></i>Saluran Aspirasi</a>
-            <a href="#video-dokumentasi" onclick="toggleMenuGlobal()"><i class="fa-solid fa-video mr-2"></i>Video Konten</a>
-        </div>
-    </nav>
+    <!-- Meta Tags Open Graph untuk WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://himapgsdumk.my.id/">
+    <meta property="og:title" content="HIMA PGSD UMK - Portal Resmi">
+    <meta property="og:description" content="Portal Resmi Himpunan Mahasiswa PGSD Universitas Muhammadiyah Kuningan. Informasi kegiatan, absensi, berita, dan transparansi keuangan.">
+    <meta property="og:image" content="https://himapgsdumk.my.id/background.jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
-    <div id="popup-informasi" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-all duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden transform scale-100 transition-transform duration-300 flex flex-col max-h-[90vh]">
-            
-            <!-- WARNA DIUBAH: Gradasi Hijau -> Gradasi Pink Premium -->
-            <div class="bg-gradient-to-r from-[#db2777] to-[#ec4899] p-5 flex justify-between items-center text-white shadow-md">
-                <h3 id="popup-title" class="font-bold text-base md:text-xl tracking-wide flex items-center gap-2"></h3>
-                <button onclick="tutupPopup()" class="text-white/80 hover:text-white hover:bg-white/20 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-lg font-bold">✕</button>
-            </div>
-
-            <div class="p-6 overflow-y-auto space-y-4 flex-1 text-slate-700">
-                <div id="popup-image-container" class="hidden w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shadow-inner max-h-[350px] flex items-center justify-center">
-                    <img id="popup-image" src="" alt="Gambar Informasi" class="w-full h-full object-contain transition-transform duration-500 hover:scale-102">
-                </div>
-                
-                <div id="popup-content" class="text-xs md:text-sm leading-relaxed whitespace-pre-line bg-slate-50 p-5 rounded-xl border border-slate-200/60 shadow-sm font-medium"></div>
-            </div>
-
-            <div class="border-t border-slate-100 p-4 bg-slate-50 flex justify-end">
-                <button onclick="tutupPopup()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 text-xs tracking-wide">
-                    Tutup Jendela
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- WARNA DIUBAH: Linear gradient dari Hijau -> Dark Pink Magenta Overlay -->
-    <section class="relative bg-cover bg-no-repeat min-h-[550px] md:h-[650px] flex flex-col justify-center px-6 md:px-20 transition-all" style="background-image: linear-gradient(rgba(219, 39, 119, 0.75), rgba(15, 23, 42, 0.95)), url('background.jpeg'); background-size: cover; background-position: center 30%;">
-        <div class="absolute top-4 left-0 w-full bg-black/50 backdrop-blur-sm text-white py-2 z-20 overflow-hidden">
-            <marquee behavior="scroll" direction="left" class="text-xs md:text-sm font-medium tracking-wide">
-                🎓 Selamat Datang di Website Resmi HIMA PGSD Universitas Muhammadiyah Kuningan • UNTUK INFORMASI LEBIH IKUTI MEDIA SOSIAL KAMI • IG: @hima.pgsd_umkuningan • TIKTOK: @himapgsd_umkuningan • YOUTUBE: HIMA PGSD UMKUNINGAN • 
-            </marquee>
-        </div>
-
-        <div class="max-w-3xl text-white mt-8">
-            <span class="bg-amber-500 text-slate-950 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow">Periode 2026-2027</span>
-            <h1 class="text-3xl md:text-5xl font-bold leading-tight mt-5 mb-2">Himpunan Mahasiswa PGSD</h1>
-            <!-- WARNA DIUBAH: Text emerald-100 -> pink-100 -->
-            <p class="text-lg md:text-xl font-light text-pink-100 mb-6">Universitas Muhammadiyah Kuningan <br><span class="italic text-amber-400">"AKU, KAMU, KITA, JADI SATU"</span></p>
-            <div class="flex space-x-4">
-                <a href="#absen" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm px-6 py-3 rounded-lg shadow-lg transition-all"><i class="fa-solid fa-user-check mr-2"></i>Absen Sekarang</a>
-                <a href="#kas" class="bg-transparent border-2 border-white hover:bg-white hover:text-slate-900 text-white font-semibold text-sm px-6 py-3 rounded-lg transition-all">Sistem Transparansi</a>
-            </div>
-        </div>
-    </section>
-
-    <section id="profil" class="max-w-6xl mx-auto px-6 -mt-16 relative z-10">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex items-center space-x-4">
-                <!-- WARNA DIUBAH: BG emerald-100/text-hijau -> BG pink-100/text-pink -->
-                <div class="p-3 bg-pink-100 text-[#db2777] rounded-lg text-2xl"><i class="fa-solid fa-users"></i></div>
-                <div><div class="text-2xl font-bold">54</div><div class="text-xs text-slate-500 font-medium">Anggota Aktif</div></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-pink-100 text-pink-600 rounded-lg text-2xl"><i class="fa-solid fa-calendar-check"></i></div>
-                <div><div class="text-2xl font-bold">39</div><div class="text-xs text-slate-500 font-medium">Program Kerja</div></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-purple-100 text-purple-600 rounded-lg text-2xl"><i class="fa-solid fa-graduation-cap"></i></div>
-                <div><div class="text-2xl font-bold">7</div><div class="text-xs text-slate-500 font-medium">Divisi Internal</div></div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex items-center space-x-4">
-                <div class="p-3 bg-pink-100 text-pink-600 rounded-lg text-2xl"><i class="fa-solid fa-fire text-orange-500"></i></div>
-                <div><div class="text-sm font-bold text-pink-600">HIMA PGSD</div><div class="text-xs text-slate-500 font-medium">Live Server</div></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="kegiatan" class="max-w-6xl mx-auto px-6 pt-16 pb-8">
-        <div class="mb-8">
-            <h2 class="text-2xl font-bold text-slate-900">Kegiatan & Berita Terbaru</h2>
-            <p class="text-sm text-slate-500 mt-1">Daftar berita aktual dikelola oleh HIMA PGSD</p>
-        </div>
-        <div id="container-berita" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="p-6 text-center text-slate-400 col-span-3">Memuat artikel berita terbaru...</div>
-        </div>
-    </section>
-
-    <section id="absen" class="bg-slate-50 py-16 px-4 md:px-6 border-y border-slate-200">
-        <div class="max-w-4xl mx-auto">
-            
-            <div id="absen-welcome-box" class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-xl mx-auto border border-slate-200 text-center space-y-6 transition-all duration-300">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
-                        </span>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gateway Absensi Aktif</span>
-                    </div>
-                    <div class="bg-slate-900 text-amber-400 font-mono text-xs font-bold px-3 py-1 rounded-lg tracking-wider">
-                        <i class="fa-regular fa-clock mr-1"></i> <span id="live-clock-absen">00:00:00</span> 
-                    </div>
-                </div>
-                <div class="w-20 h-20 bg-pink-50 text-[#db2777] rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-inner">
-                    <i class="fa-solid fa-user-check"></i>
-                </div>
-                <div class="space-y-2">
-                    <h3 class="font-bold text-xl text-slate-800">Portal Presensi HIMA PGSD</h3>
-                    <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">Silakan masuk menggunakan akun kredensial pengurus resmi untuk melakukan penguncian koordinat kehadiran kegiatan.</p>
-                </div>
-                <button onclick="bukaGerbangLogin()" class="w-full bg-[#db2777] hover:bg-[#be185d] text-white font-bold text-xs py-4 rounded-xl shadow-lg shadow-pink-900/10 transition-all flex items-center justify-center gap-2 group">
-                    <span>Masuk ke Panel Presensi</span>
-                    <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                </button>
-            </div>
-
-            <div id="absen-login-box" class="hidden bg-white p-6 md:p-8 rounded-2xl shadow-xl max-w-xl mx-auto border border-slate-200 space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase">Otentikasi Internal</span>
-                    <button onclick="kembaliKeWelcome()" class="text-xs text-slate-400 hover:text-rose-500 transition-colors font-medium"><i class="fa-solid fa-xmark"></i> Batal</button>
-                </div>
-                <form id="form-login-absen" class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Username Pengurus</label>
-                        <input type="text" id="absen-user-input" placeholder="Masukkan username" class="w-full text-xs px-3 py-2.5 border rounded-lg bg-slate-50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#db2777]/20" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
-                        <input type="password" id="absen-pass-input" placeholder="••••••••" class="w-full text-xs px-3 py-2.5 border rounded-lg bg-slate-50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#db2777]/20" required>
-                    </div>
-                    <button type="submit" class="w-full bg-[#db2777] hover:bg-[#be185d] text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all">Verifikasi & Masuk</button>
-                </form>
-            </div>
-
-            <div id="absen-main-box" class="hidden bg-[#e2e8f0]/40 p-6 md:p-12 rounded-[2.5rem] max-w-2xl mx-auto border border-white/60 shadow-sm space-y-6">
-                <div class="bg-[#f1f5f9]/90 border border-slate-200/60 rounded-xl px-4 py-3 flex justify-between items-center">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-pink-600 text-sm"><i id="gps-icon" class="fa-solid fa-location-dot"></i></span>
-                        <span id="gps-status-text" class="text-xs font-bold text-pink-700 tracking-wide">Satelit GPS Terkunci</span>
-                    </div>
-                    <button id="btn-pindai-gps" class="bg-[#ec4899] hover:bg-[#db2777] text-white text-[11px] font-bold px-4 py-2.5 rounded-lg shadow-sm flex items-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-satellite-dish text-[10px]"></i> Pindai Koordinat
-                    </button>
-                </div>
-
-                <form id="form-absen-online" class="space-y-5">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-800">Pilih Agenda Acara HIMA</label>
-                        <div class="relative">
-                            <select id="absen-kegiatan" class="w-full text-xs px-3.5 py-3 border border-slate-200 rounded-xl bg-white focus:outline-none appearance-none cursor-pointer text-slate-600 font-medium" required>
-                                <option value="">-- Pilih Agenda --</option>
-                            </select>
-                            <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 pointer-events-none">
-                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="bg-transparent border border-slate-200/80 rounded-xl p-4 text-xs space-y-2">
-                        <div class="flex items-center space-x-1.5 text-slate-700">
-                            <i class="fa-solid fa-clock text-amber-600 text-[11px]"></i>
-                            <span>Target Jam Mulai:</span>
-                            <span id="adm-rule-jam" class="font-bold text-slate-900">--:--</span>
-                            <span class="text-slate-900 font-bold">WIB</span>
-                        </div>
-                        <div class="flex items-center space-x-1.5 text-slate-700">
-                            <i class="fa-solid fa-location-dot text-pink-600 text-[11px]"></i>
-                            <span>Jarak Anda saat ini:</span>
-                            <span id="adm-rule-jarak" class="font-bold text-pink-600 underline decoration-dotted">Menghitung...</span>
-                        </div>
-                        <p class="text-[10px] text-slate-400 italic leading-relaxed pt-1">
-                            * Kunci GPS Akurat: Tombol absen otomatis dinonaktifkan jika jarak melampaui batas 400 meter.
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-800">Departemen / Divisi HIMA</label>
-                            <input type="text" id="absen-nim" placeholder="Contoh: Divisi Keorganisasian" class="w-full text-xs px-4 py-3 border border-slate-200/80 rounded-xl bg-[#f8fafc]/50 placeholder:text-slate-400 focus:outline-none focus:bg-white" required>
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-800">Nama Lengkap</label>
-                            <input type="text" id="absen-nama" placeholder="Masukkan nama" class="w-full text-xs px-4 py-3 border border-slate-200/80 rounded-xl bg-[#f8fafc]/50 placeholder:text-slate-400 focus:outline-none focus:bg-white" required>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" id="btn-absen" class="w-full bg-slate-400 text-slate-200 font-bold text-xs py-4 rounded-xl shadow-md cursor-not-allowed transition-all flex items-center justify-center gap-2" disabled>
-                        <i class="fa-solid fa-location-crosshairs text-[11px]"></i> Kunci Lokasi Terlebih Anda
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <script>
-            // State penanda apakah user sudah menekan submit/berhasil absen
-            let statusSudahAbsen = false;
-
-            function paksaKeluarSesiAbsen(alasan) {
-                const mainBox = document.getElementById('absen-main-box');
-                
-                // Eksekusi jika panel presensi utama sedang terbuka aktif
-                if (mainBox && !mainBox.classList.contains('hidden')) {
-                    mainBox.classList.add('hidden');
-                    document.getElementById('absen-login-box').classList.add('hidden');
-                    document.getElementById('absen-welcome-box').classList.remove('hidden');
-                    
-                    const formLogin = document.getElementById('form-login-absen');
-                    if(formLogin) formLogin.reset();
-                    
-                    // Reset status flag
-                    statusSudahAbsen = false;
-
-                    if (alasan === "scroll") {
-                        alert("Sesi presensi Anda ditutup otomatis karena Anda menggulir halaman keluar dari area absensi.");
-                    } else if (alasan === "sukses") {
-                        alert("Sesi presensi ditutup dengan aman. Terima kasih data kehadiran Anda telah terekam.");
-                    }
-                }
-            }
-
-            // 1. EVENT KETIKA BERHASIL SUBMIT ABSEN
-            // (Modifikasi/pastikan fungsi submit form presensi Anda memanggil pemicu ini di bagian akhir suksesnya)
-            document.getElementById('form-absen-online').addEventListener('submit', function(e) {
-                // Catatan: Logika asli simpan database ke Firebase tetap berjalan di modul script utama Anda.
-                // Baris ini disiapkan sebagai pemberitahu sinyal proteksi
-                statusSudahAbsen = true;
-                
-                // Beri jeda 1 detik agar alert bawaan firebase sukses muncul dulu, baru kunci panelnya
-                setTimeout(() => {
-                    paksaKeluarSesiAbsen("sukses");
-                }, 1000);
-            });
-
-            // 2. DETEKSI PENGGUNA SCROLL KELUAR DARI VIEWPORT ABSENSI
-            let timeoutDeteksiScroll;
-            window.addEventListener("scroll", () => {
-                const mainBox = document.getElementById('absen-main-box');
-                
-                if (mainBox && !mainBox.classList.contains('hidden')) {
-                    const areaAbsen = document.getElementById("absen");
-                    const koordinat = areaAbsen.getBoundingClientRect();
-                    
-                    // Kondisi mendeteksi area form absen sudah bergeser total dari layar HP/Laptop
-                    const sudahTerlanjurDigulir = (koordinat.top > window.innerHeight || koordinat.bottom < 0);
-                    
-                    if (sudahTerlanjurDigulir) {
-                        clearTimeout(timeoutDeteksiScroll);
-                        timeoutDeteksiScroll = setTimeout(() => {
-                            paksaKeluarSesiAbsen("scroll");
-                        }, 300); 
-                    }
-                }
-            });
-        </script>
-    </section>
-
-    <!-- SECTION KEUANGAN (WARNA DIUBAH: Hijau Sage -> Pink Magenta Theme) -->
-    <section id="kas" class="bg-[#db2777] text-[#fdf2f8] py-16 px-6">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div class="lg:col-span-7 space-y-6">
-                <div>
-                    <span class="text-pink-200 text-xs font-bold uppercase tracking-widest flex items-center gap-2">SISTEM FINANSIAL LIVE</span>
-                    <h2 class="text-3xl font-bold mt-2">Informasi Keuangan</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-[#ec4899] p-4 rounded-xl border border-[#f472b6]/40 shadow-md">
-                        <div class="text-[10px] text-pink-100/80">Total Pemasukan</div>
-                        <div id="live-pemasukan" class="text-lg font-bold text-white">Rp 0</div>
-                    </div>
-                    <div class="bg-[#ec4899] p-4 rounded-xl border border-[#f472b6]/40 shadow-md">
-                        <div class="text-[10px] text-rose-100/80">Total Pengeluaran</div>
-                        <div id="live-pengeluaran" class="text-lg font-bold text-rose-200">Rp 0</div>
-                    </div>
-                    <div class="bg-[#ec4899] p-4 rounded-xl border border-[#f472b6]/40 shadow-md">
-                        <div class="text-[10px] text-amber-200/80">Sisa Saldo Kas </div>
-                        <div id="live-saldo" class="text-lg font-bold text-amber-300">Rp 0</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-5 bg-[#ec4899] p-5 rounded-2xl border border-[#f472b6]/40 shadow-md space-y-3">
-                <div class="flex items-center space-x-3 mb-2">
-                    <div class="p-2.5 bg-[#db2777] text-pink-200 rounded-xl text-lg">
-                        <i class="fa-solid fa-building-columns"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold">Informasi Pembayaran</h3>
-                        <p class="text-[10px] text-pink-100/70">Silakan transfer ke rekening resmi Bendahara HIMA PGSD berikut:</p>
-                    </div>
-                </div>
-                
-                <div class="space-y-2">
-                    <div class="bg-[#db2777] p-3 rounded-xl border border-[#f472b6]/30 flex justify-between items-center text-xs">
-                        <div class="space-y-1">
-                            <div><span class="text-[11px] text-amber-400 font-extrabold uppercase tracking-wider">BANK BRI</span></div>
-                            <div class="font-mono text-sm tracking-wide text-white font-bold" id="num-bri">0005 0121 8590 502</div>
-                            <div class="text-[10px] text-pink-100/60">a.n. Dede Sri Nur Khotimah</div>
-                        </div>
-                        <button onclick="salinTeks('num-bri')" class="text-[10px] bg-[#ec4899] hover:bg-[#f472b6] border border-[#f472b6]/50 px-3 py-1.5 rounded-lg font-medium transition-all"><i class="fa-regular fa-copy mr-1"></i>Salin</button>
-                    </div>
-
-                    <div class="bg-[#db2777] p-3 rounded-xl border border-[#f472b6]/30 flex justify-between items-center text-xs">
-                        <div class="space-y-1">
-                            <div><span class="text-[11px] text-pink-200 font-extrabold uppercase tracking-wider">E-WALLET GOPAY</span></div>
-                            <div class="font-mono text-sm tracking-wide text-white font-bold" id="num-gopay">0895 2885 7905</div>
-                            <div class="text-[10px] text-pink-100/60">a.n. Naila</div>
-                        </div>
-                        <button onclick="salinTeks('num-gopay')" class="text-[10px] bg-[#ec4899] hover:bg-[#f472b6] border border-[#f472b6]/50 px-3 py-1.5 rounded-lg font-medium transition-all"><i class="fa-regular fa-copy mr-1"></i>Salin</button>
-                    </div>
-
-                    <div class="bg-[#db2777] p-3 rounded-xl border border-[#f472b6]/30 flex justify-between items-center text-xs">
-                        <div class="space-y-1">
-                            <div><span class="text-[11px] text-teal-300 font-extrabold uppercase tracking-wider">E-WALLET DANA</span></div>
-                            <div class="font-mono text-sm tracking-wide text-white font-bold" id="num-dana">0896 6147 0809</div>
-                            <div class="text-[10px] text-pink-100/60">a.n. Dede Sri Nur Khotimah</div>
-                        </div>
-                        <button onclick="salinTeks('num-dana')" class="text-[10px] bg-[#ec4899] hover:bg-[#f472b6] border border-[#f472b6]/50 px-3 py-1.5 rounded-lg font-medium transition-all"><i class="fa-regular fa-copy mr-1"></i>Salin</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="aspirasi" class="max-w-6xl mx-auto px-6 py-16">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div class="lg:col-span-5 space-y-4">
-                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Suara Mahasiswa</span>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">Saluran Aspirasi <br>& Kritik Konstruktif</h2>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    Punya ide untuk kegiatan HIMA? Tuliskan aspirasi Anda di sini. Semua pesan akan masuk langsung ke server kami.
-                </p>
-            </div>
-
-            <div class="lg:col-span-7">
-                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 relative overflow-hidden">
-                    <!-- WARNA DIUBAH: Garis hiasan atas -> Gradasi Pink Soft -->
-                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#db2777] to-pink-400"></div>
-                    <form id="form-aspirasi-online" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Identitas Pengirim</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <!-- WARNA DIUBAH: Border & text -> Pink Theme -->
-                                <label class="border-2 border-[#db2777] bg-pink-50/20 p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all" id="label-anonim">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fa-solid fa-user-secret text-[#db2777] text-sm"></i>
-                                        <span class="text-xs font-semibold text-[#db2777]">Anonim</span>
-                                    </div>
-                                    <input type="radio" name="opsi_nama" value="Anonim" checked onchange="toggleInputNama(this)" class="accent-[#db2777] h-3.5 w-3.5">
-                                </label>
-                                <label class="border border-slate-200 p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all hover:bg-slate-50" id="label-nama">
-                                    <div class="flex items-center space-x-2">
-                                        <i class="fa-solid fa-id-card text-slate-400 text-sm"></i>
-                                        <span class="text-xs font-semibold text-slate-600">Tulis Nama</span>
-                                    </div>
-                                    <input type="radio" name="opsi_nama" value="Tulis" onchange="toggleInputNama(this)" class="accent-[#db2777] h-3.5 w-3.5">
-                                </label>
-                            </div>
-                        </div>
-
-                        <div id="box-nama-pilihan" class="hidden transition-all duration-300">
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap / NIM</label>
-                            <input type="text" id="aspirasi-nama-user" placeholder="Masukkan nama Anda..." class="w-full text-xs px-3 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#db2777]/20 focus:border-[#db2777] focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategori</label>
-                            <select id="aspirasi-kategori" class="w-full text-xs px-3 py-3 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-[#db2777]/20 focus:border-[#db2777] focus:outline-none" required>
-                                <option value="Saran Program Kerja">💡 Saran & Ide Kegiatan</option>
-                                <option value="Kritik Kinerja HIMA">📣 Kritik Kinerja Pengurus</option>
-                                <option value="Keluhan Kampus">🏫 Fasilitas Kampus & Akademik</option>
-                                <option value="Lain-lain">✨ Lain-lain</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700">Detail Pesan Aspirasi</label>
-                                <span class="text-[10px] text-slate-400" id="char-counter">0 / 2000 Karakter</span>
-                            </div>
-                            <div class="relative">
-                                <textarea id="textaspirasi" rows="4" maxlength="2000" class="w-full text-xs p-3.5 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#db2777]/20 focus:border-[#db2777] focus:outline-none placeholder:text-slate-400" placeholder="Tuliskan keluh kesah..." required></textarea>
-                            </div>
-                        </div>
-
-                        <!-- WARNA DIUBAH: BG Gradasi Hijau -> BG Gradasi Pink Premium -->
-                        <button type="submit" class="w-full bg-gradient-to-r from-[#db2777] to-[#ec4899] hover:from-[#be185d] hover:to-[#db2777] text-white text-xs font-bold py-3.5 rounded-xl shadow-lg shadow-pink-500/10 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-paper-plane"></i>
-                            <span>Terbangkan Aspirasi Saya</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="video-dokumentasi" class="bg-slate-900 text-white py-16 px-6 border-t border-slate-800">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-10 space-y-2">
-                <span class="text-amber-400 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play animate-pulse"></i> Dokumentasi Kreatif & Media Informasi
-                </span>
-                <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Kanal Video & Media Sosial HIMA</h2>
-                <p class="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                    Tonton keseruan video dokumentasi prodi PGSD melalui platform YouTube, TikTok, dan Instagram secara langsung.
-                </p>
-            </div>
-
-            <div class="relative max-w-xl mx-auto overflow-hidden rounded-2xl border border-slate-700/80 shadow-2xl bg-black">
-                <div id="slider-track-video" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%);">
-                    <div id="loader-video-sosmed" class="w-full flex-shrink-0 text-center py-20 text-slate-400 text-xs">
-                        <!-- WARNA DIUBAH: Spinner -> pink -->
-                        <i class="fa-solid fa-spinner animate-spin text-xl mb-2 text-pink-500 block"></i> Menghubungkan ke Feed Media Informasi...
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex justify-center space-x-1.5 mt-5" id="slider-dots-video"></div>
-        </div>
-    </section>
-
-    <section id="kontak" class="bg-slate-100 border-t border-slate-200 py-16 px-6">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <div class="lg:col-span-7 space-y-4">
-                <div>
-                    <!-- WARNA DIUBAH: BG Hijau -> BG Pink Soft -->
-                    <span class="bg-pink-100 text-[#db2777] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">Lokasi Kampus</span>
-                    <h2 class="text-2xl font-bold text-slate-900 mt-2">UNIVERSITAS MUHAMMADIYAH KUNINGAN</h2>
-                    <p class="text-xs text-slate-500 mt-1">Universitas Muhammadiyah Kuningan. Jl. Raya Cigugur No.28, Kuningan, Kec. Kuningan, Kabupaten Kuningan, Jawa Barat 45511</p>
-                </div>
-                <div class="w-full h-72 rounded-2xl overflow-hidden shadow-md border border-white">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.2727142461876!2d108.49072937587754!3d-6.977114668322629!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6f16f39695d6cb%3A0x633cb8e3676dbcfb!2sUniversitas%20Muhammadiyah%20Kuningan!5e0!3m2!1sid!2sid!4v1719999999999!5m2!1sid!2sid" 
-                        class="w-full h-full border-0" 
-                        allowfullscreen="" 
-                        loading="lazy" 
-                        referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
-                </div>
-            </div>
-
-            <div class="lg:col-span-5 space-y-4 lg:pl-4">
-                <div>
-                    <span class="bg-pink-100 text-pink-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">SALURAN RESMI</span>
-                    <h2 class="text-2xl font-bold text-slate-900 mt-2">Sosial Media HIMA PGSD UMK</h2>
-                    <p class="text-xs text-slate-500 mt-1">Ikuti perkembangan informasi seputar prodi dan kegiatan mahasiswa melalui platform di bawah ini:</p>
-                </div>
-
-                <div class="grid grid-cols-1 gap-2.5 pt-2">
-                    <a href="https://www.instagram.com/hima.pgsd_umkuningan?igsh=eno0MjRqejE0dWR1" target="_blank" class="flex items-center justify-between p-3 bg-white hover:bg-pink-50 border border-slate-200 rounded-xl shadow-sm transition-all group">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 bg-gradient-to-tr from-yellow-500 via-pink-500 to-purple-600 text-white rounded-lg flex items-center justify-center text-lg shadow-sm"><i class="fa-brands fa-instagram"></i></div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-800">Instagram</div>
-                                <div class="text-[10px] text-slate-400 group-hover:text-pink-600 transition-colors">@hima.pgsd_umkuningan</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-
-                    <a href="https://www.tiktok.com/@himapgsd_umkuningan?_r=1&_t=ZS-97zCozaADSx" target="_blank" class="flex items-center justify-between p-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition-all group">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 bg-black text-white rounded-lg flex items-center justify-center text-lg shadow-sm"><i class="fa-brands fa-tiktok"></i></div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-800">TikTok</div>
-                                <div class="text-[10px] text-slate-400 group-hover:text-slate-900 transition-colors">@himapgsd_umkuningan</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-
-                    <a href="https://youtube.com/@himapgsdstkipm?si=FRbw0HIE9Y_nvyKd" target="_blank" class="flex items-center justify-between p-3 bg-white hover:bg-rose-50 border border-slate-200 rounded-xl shadow-sm transition-all group">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 bg-rose-600 text-white rounded-lg flex items-center justify-center text-lg shadow-sm"><i class="fa-brands fa-youtube"></i></div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-800">YouTube Channel</div>
-                                <div class="text-[10px] text-slate-400 group-hover:text-rose-600 transition-colors">HIMA PGSD UMKUNINGAN</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-
-                    <a href="mailto:himapgsdumkngn@gmail.com" class="flex items-center justify-between p-3 bg-white hover:bg-pink-50 border border-slate-200 rounded-xl shadow-sm transition-all group">
-                        <div class="flex items-center space-x-3">
-                            <!-- WARNA DIUBAH: BG Hijau -> BG Pink Premium -->
-                            <div class="w-9 h-9 bg-[#db2777] text-white rounded-lg flex items-center justify-center text-sm shadow-sm"><i class="fa-solid fa-envelope"></i></div>
-                            <div>
-                                <div class="text-xs font-bold text-slate-800">Surel / Email Resmi</div>
-                                <div class="text-[10px] text-slate-400 group-hover:text-[#db2777] transition-colors">himapgsdumkngn@gmail.com</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <footer class="bg-[#0b1329] text-slate-500 text-xs py-6 text-center">
-        <p>© 2026 HIMA PGSD Universitas Muhammadiyah Kuningan.</p>
-    </footer>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-    apiKey: "AIzaSyCoz4qB0dkhJdDIFdCgsi0A_hmfrQpUFS0",
-    authDomain: "himapgsdumk-11157.firebaseapp.com",
-    projectId: "himapgsdumk-11157",
-    storageBucket: "himapgsdumk-11157.firebasestorage.app",
-    messagingSenderId: "585963317074",
-    appId: "1:585963317074:web:2e62292f9db4e41be97c8b",
-    measurementId: "G-B6DV6HTQP6"
-};
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let userLat = null, userLon = null, DB_ACARA = {};
-        let DATA_CLOUD_GLOBAL = [];
-        let intervalSliderGlobal = null;
-        let intervalSliderVideo = null;
-
-        window.toggleMenuGlobal = () => { document.getElementById('dropdown-menu-global').classList.toggle('hidden'); }
-        window.salinTeks = (id) => { navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => alert("Disalin!")); }
-        window.bukaPopup = bukaPopup;
-        window.tutupPopup = () => { 
-            if(intervalSliderGlobal) clearInterval(intervalSliderGlobal);
-            document.getElementById('popup-informasi').classList.add('hidden'); 
-        }
-        window.bukaGerbangLogin = () => {
-            document.getElementById('absen-welcome-box').classList.add('hidden');
-            document.getElementById('absen-login-box').classList.remove('hidden');
-        }
-        window.kembaliKeWelcome = () => {
-            document.getElementById('absen-login-box').classList.add('hidden');
-            document.getElementById('absen-welcome-box').classList.remove('hidden');
-        }
-        window.toggleInputNama = (radio) => {
-            const boxNama = document.getElementById('box-nama-pilihan');
-            if (radio.value === 'Tulis') { boxNama.classList.remove('hidden'); } 
-            else { boxNama.classList.add('hidden'); }
-        }
-        window.bukaPopupDinamisByIndex = (index) => {
-            const beritaFrontPage = DATA_CLOUD_GLOBAL.filter(item => {
-                const m = item.menu ? item.menu.toLowerCase() : "berita";
-                return m === "berita" || m === "kegiatan";
-            });
-            bukaPopup("dinamis", beritaFrontPage[index]);
-        }
-
-        // 1. REALTIME STREAMING POSTINGAN (PUBLIKASI)
-        const qPublikasi = query(collection(db, "publikasi"), orderBy("timestamp", "desc"));
-        onSnapshot(qPublikasi, (snapshot) => {
-            DATA_CLOUD_GLOBAL = [];
-            snapshot.forEach(doc => {
-                DATA_CLOUD_GLOBAL.push(doc.data());
-            });
-
-            const containerBerita = document.getElementById('container-berita');
-            const beritaFrontPage = DATA_CLOUD_GLOBAL.filter(item => {
-                const m = item.menu ? item.menu.toLowerCase() : "berita";
-                return m === "berita" || m === "kegiatan";
-            });
-
-            if (beritaFrontPage.length > 0) {
-                containerBerita.innerHTML = "";
-                beritaFrontPage.forEach((item, index) => {
-                    const imgUrl = item.gambar && item.gambar.trim() !== "" ? item.gambar : 'https://via.placeholder.com/400x250?text=HIMA+PGSD';
-                    // WARNA DIUBAH: Tag & link tombol baca menggunakan warna pink premium
-                    containerBerita.innerHTML += `
-                        <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden flex flex-col hover:shadow-xl transition-all duration-300">
-                            <div class="h-48 bg-slate-900 overflow-hidden relative flex items-center justify-center">
-                                <img src="${imgUrl}" alt="${item.judul}" class="w-full h-full object-contain">
-                                <span class="absolute top-3 left-3 bg-[#db2777] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">${item.kategori || 'Berita'}</span>
-                            </div>
-                            <div class="p-5 flex flex-col flex-1 space-y-3">
-                                <h3 class="font-bold text-slate-900 text-sm line-clamp-2">${item.judul}</h3>
-                                <p class="text-xs text-slate-500 line-clamp-3 leading-relaxed">${item.isi}</p>
-                                <div class="pt-2 mt-auto">
-                                    <button onclick="bukaPopupDinamisByIndex(${index})" class="text-xs text-[#db2777] font-semibold flex items-center gap-1 hover:text-[#be185d]">
-                                        <span>Baca Selengkapnya</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else {
-                containerBerita.innerHTML = '<div class="p-6 text-center text-slate-400 col-span-3">Belum ada artikel berita terbaru.</div>';
-            }
-        });
-
-        // 2. REALTIME STREAMING KEUANGAN
-        onSnapshot(doc(db, "keuangan", "ringkasan"), (docSnap) => {
-            if(docSnap.exists()) {
-                const res = docSnap.data();
-                const pemasukan = parseInt(res.pemasukan || 0);
-                const pengeluaran = parseInt(res.pengeluaran || 0);
-                const sisaSaldo = pemasukan - pengeluaran;
-
-                document.getElementById('live-pemasukan').innerText = "Rp " + pemasukan.toLocaleString('id-ID');
-                document.getElementById('live-pengeluaran').innerText = "Rp " + pengeluaran.toLocaleString('id-ID');
-                document.getElementById('live-saldo').innerText = "Rp " + sisaSaldo.toLocaleString('id-ID');
-            }
-        });
-
-        // 3. REALTIME STREAMING TARGET ABSENSI ACARA
-        onSnapshot(collection(db, "jadwalAbsen"), (snapshot) => {
-            const select = document.getElementById('absen-kegiatan');
-            select.innerHTML = '<option value="">-- Pilih Agenda --</option>';
-            DB_ACARA = {};
-            snapshot.forEach(doc => {
-                DB_ACARA[doc.id] = doc.data();
-                let opt = document.createElement('option'); 
-                opt.value = doc.id; 
-                opt.innerText = doc.id;
-                select.appendChild(opt);
-            });
-        });
-
-        // 4. REALTIME STREAMING VIDEO SOSMED
-        const qVideo = query(collection(db, "videoSosmed"), orderBy("timestamp", "desc"));
-        onSnapshot(qVideo, (snapshot) => {
-            const trackVideo = document.getElementById('slider-track-video');
-            const dotsVideoContainer = document.getElementById('slider-dots-video');
-            
-            if(intervalSliderVideo) clearInterval(intervalSliderVideo);
-            trackVideo.innerHTML = "";
-            dotsVideoContainer.innerHTML = "";
-
-            let listVideo = [];
-            snapshot.forEach(doc => {
-                listVideo.push(doc.data());
-            });
-
-            if(listVideo.length === 0) {
-                trackVideo.innerHTML = `
-                    <div class="w-full flex-shrink-0 text-center py-16 text-slate-500 text-xs">
-                        <i class="fa-solid fa-video-slash text-2xl mb-2 text-slate-600 block"></i> Belum ada rekaman konten media di database.
-                    </div>
-                `;
-                return;
-            }
-
-            listVideo.forEach((item) => {
-                trackVideo.innerHTML += `
-                    <div class="w-full flex-shrink-0 px-2">
-                        <div class="w-full aspect-video md:h-80 bg-slate-950 flex items-center justify-center">
-                            ${item.embedCode}
-                        </div>
-                        <div class="p-4 bg-slate-800 border-t border-slate-700">
-                            <span class="text-[10px] font-bold text-pink-400 uppercase tracking-wider">${item.platform || 'Media'}</span>
-                            <h4 class="font-bold text-white text-xs md:text-sm mt-0.5 line-clamp-1">${item.judul}</h4>
-                        </div>
-                    </div>
-                `;
-            });
-
-            listVideo.forEach((_, idx) => {
-                // WARNA DIUBAH: Dot slider aktif -> pink
-                dotsVideoContainer.innerHTML += `<span class="w-2 h-2 rounded-full bg-slate-700 transition-all duration-300 ${idx===0 ? 'bg-pink-500 w-4':''}" data-video-index="${idx}"></span>`;
-            });
-
-            let currentVideoSlide = 0;
-            const dotsVideo = dotsVideoContainer.querySelectorAll('span');
-
-            if(listVideo.length > 1) {
-                intervalSliderVideo = setInterval(() => {
-                    currentVideoSlide = (currentVideoSlide + 1) % listVideo.length;
-                    trackVideo.style.transform = `translateX(-${currentVideoSlide * 100}%)`;
-                    dotsVideo.forEach((dot, dIdx) => {
-                        if(dIdx === currentVideoSlide) {
-                            dot.classList.add('bg-pink-500', 'w-4');
-                            dot.classList.remove('bg-slate-700');
-                        } else {
-                            dot.classList.remove('bg-pink-500', 'w-4');
-                            dot.classList.add('bg-slate-700');
-                        }
-                    });
-                }, 6000);
-            }
-        });
-
-        // POPUP MODAL + SLIDER DATA INTERNAL
-        function bukaPopup(jenis, dataDinamis = null) {
-            if(intervalSliderGlobal) clearInterval(intervalSliderGlobal);
-            document.getElementById('dropdown-menu-global').classList.add('hidden');
-            const popup = document.getElementById('popup-informasi');
-            const title = document.getElementById('popup-title');
-            const content = document.getElementById('popup-content');
-            const imgContainer = document.getElementById('popup-image-container');
-            const imgElement = document.getElementById('popup-image');
-            
-            imgContainer.classList.add('hidden');
-            imgElement.src = "";
-
-            if (dataDinamis) {
-                title.innerHTML = `<i class="fa-solid fa-newspaper"></i> ${dataDinamis.judul}`;
-                content.innerHTML = `<p class="whitespace-pre-line">${dataDinamis.isi}</p>`;
-                if (dataDinamis.gambar && dataDinamis.gambar.trim() !== "") {
-                    imgElement.src = dataDinamis.gambar;
-                    imgContainer.classList.remove('hidden');
-                }
-            } else if (jenis === 'beasiswa' || jenis === 'galeri') {
-                const filterData = DATA_CLOUD_GLOBAL.filter(item => item.menu && item.menu.toLowerCase() === jenis.toLowerCase());
-                title.innerHTML = jenis === 'beasiswa' ? '<i class="fa-solid fa-graduation-cap"></i> Informasi Beasiswa Terkini' : '<i class="fa-solid fa-images"></i> Galeri Kegiatan Terkini';
-                
-                if(filterData.length === 0) {
-                    content.innerHTML = `<div class="text-center py-8 text-slate-400 font-medium"><i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300 block"></i>Belum ada data ${jenis} di Firebase Cloud.</div>`;
-                } else {
-                    let sliderHTML = `
-                        <div class="relative w-full overflow-hidden">
-                            <div id="slider-track-popup" class="flex transition-transform duration-700 ease-in-out" style="transform: translateX(0%);">
-                    `;
-                    filterData.forEach(item => {
-                        const cardImg = item.gambar && item.gambar.trim() !== "" ? `<div class="w-full h-44 mb-3 rounded-lg overflow-hidden bg-slate-900 shadow-inner flex items-center justify-center"><img src="${item.gambar}" class="w-full h-full object-contain"></div>` : '';
-                        sliderHTML += `
-                            <div class="w-full flex-shrink-0 px-1">
-                                <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm">
-                                    ${cardImg}
-                                    <h4 class="font-bold text-slate-800 text-sm md:text-base mb-1.5">${item.judul}</h4>
-                                    <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">${item.isi}</p>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    sliderHTML += `</div></div>
-                        <div class="flex justify-center space-x-1.5 mt-3" id="slider-dots-popup"></div>
-                    `;
-                    content.innerHTML = sliderHTML;
-
-                    const dotsContainer = document.getElementById('slider-dots-popup');
-                    filterData.forEach((_, idx) => {
-                        // WARNA DIUBAH: Dot aktif -> pink
-                        dotsContainer.innerHTML += `<span class="w-2 h-2 rounded-full bg-slate-300 transition-all duration-300 ${idx===0 ? 'bg-[#db2777] w-4':''}" data-index="${idx}"></span>`;
-                    });
-
-                    let currentSlide = 0;
-                    const track = document.getElementById('slider-track-popup');
-                    const dots = dotsContainer.querySelectorAll('span');
-                    
-                    if(filterData.length > 1) {
-                        intervalSliderGlobal = setInterval(() => {
-                            currentSlide = (currentSlide + 1) % filterData.length;
-                            track.style.transform = `translateX(-${currentSlide * 100}%)`;
-                            dots.forEach((dot, dIdx) => {
-                                if(dIdx === currentSlide) { dot.classList.add('bg-[#db2777]', 'w-4'); dot.classList.remove('bg-slate-300'); }
-                                else { dot.classList.remove('bg-[#db2777]', 'w-4'); dot.classList.add('bg-slate-300'); }
-                            });
-                        }, 5000);
-                    }
-                }
-            } else {
-                const dataKustom = DATA_CLOUD_GLOBAL.find(item => item.menu && item.menu.toLowerCase() === jenis.toLowerCase());
-                if (dataKustom && jenis !== 'kabinet' && jenis !== 'struktur') {
-                    title.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${dataKustom.judul}`;
-                    content.innerHTML = `<p class="whitespace-pre-line">${dataKustom.isi}</p>`;
-                    if (dataKustom.gambar && dataKustom.gambar.trim() !== "") {
-                        imgElement.src = dataKustom.gambar;
-                        imgContainer.classList.remove('hidden');
-                    }
-                } else {
-                    if(jenis === 'kabinet') {
-                        title.innerHTML = '<i class="fa-solid fa-box-archive"></i> Profil & Filosofi Kabinet';
-                        content.innerHTML = `
-                            <div class="flex flex-col items-center justify-center space-y-3 mb-5 border-b pb-4 border-slate-200">
-                                <div class="w-24 h-24 rounded-full p-0.5 bg-gradient-to-tr from-[#db2777] to-[#ec4899] shadow-sm flex items-center justify-center overflow-hidden">
-                                    <img src="kabinet.jpeg" alt="Logo Kabinet" class="w-full h-full object-cover rounded-full bg-white" onerror="this.src='https://via.placeholder.com/90x90?text=KABINET'">
-                                </div>
-                                <h4 class="text-base font-bold text-slate-800 text-center uppercase tracking-wide">KABINET KARSA BASKARA</h4>
-                                <div class="bg-pink-50 text-[11px] text-[#db2777] border border-pink-200/60 px-4 py-3 rounded-xl text-center shadow-sm font-medium space-y-2 max-w-xl">
-                                    <p class="not-italic text-slate-600">
-                                        Kabinet Karsa Baskara merupakan representasi dari tekad untuk menghadirkan karya yang menjadi cahaya bagi organisasi. Berlandaskan ilmu, dipandu oleh visi yang jelas, serta didorong semangat kolaborasi, kabinet ini berkomitmen untuk terus bertumbuh, menginspirasi, dan memberikan manfaat nyata bagi HIMA PGSD maupun lingkungan sekitarnya.
-                                    </p>
-                                    <p class="italic font-semibold text-[#db2777] pt-1 border-t border-pink-200/40">
-                                        “Karsa yang diwujudkan melalui karya, diterangi oleh Baskara yang menghangatkan, sehingga setiap langkah menjadi cahaya yang membawa perubahan.”
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-3 text-xs md:text-sm">
-                                <h5 class="font-bold text-slate-900 flex items-center gap-1.5 mb-2 text-sm">
-                                    <span class="w-1.5 h-4 bg-[#db2777] rounded-full"></span> Filosofi Logo & Komponen:
-                                </h5>
-                                <div class="grid grid-cols-1 gap-2.5">
-                                    
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-3 items-start">
-                                        <div class="text-lg p-1 text-amber-500"><i class="fa-solid fa-sun"></i></div>
-                                        <div>
-                                            <strong class="text-slate-800 block text-xs md:text-sm">MATAHARI (BASKARA)</strong>
-                                            <span class="text-slate-600 block text-[11px] md:text-xs mb-1">Matahari menjadi simbol utama yang melambangkan cahaya, harapan, semangat, dan sumber kehidupan.</span>
-                                            <span class="text-[#db2777] italic font-medium text-[10px] md:text-[11px]">“Baskara hadir sebagai cahaya yang tak hanya menyinari, tetapi juga menghangatkan setiap perjalanan menuju perubahan.”</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-3 items-start">
-                                        <div class="text-lg p-1 text-yellow-500"><i class="fa-solid fa-star"></i></div>
-                                        <div>
-                                            <strong class="text-slate-800 block text-xs md:text-sm">BINTANG DI TENGAH MATAHARI</strong>
-                                            <span class="text-slate-600 block text-[11px] md:text-xs mb-1">Bintang melambangkan arah, cita-cita, dan visi bersama.</span>
-                                            <span class="text-[#db2777] italic font-medium text-[10px] md:text-[11px]">“Di balik setiap langkah, selalu ada tujuan yang menjadi penunjuk arah untuk terus bertumbuh.”</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-3 items-start">
-                                        <div class="text-lg p-1 text-pink-600"><i class="fa-solid fa-pen-nib"></i></div>
-                                        <div>
-                                            <strong class="text-slate-800 block text-xs md:text-sm">PENA</strong>
-                                            <span class="text-slate-600 block text-[11px] md:text-xs mb-1">Pena melambangkan ilmu pengetahuan, kreativitas, komunikasi, dan keberanian menyampaikan gagasan.</span>
-                                            <span class="text-[#db2777] italic font-medium text-[10px] md:text-[11px]">“Setiap goresan pena adalah awal dari perubahan yang akan dikenang.”</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-3 items-start">
-                                        <div class="text-lg p-1 text-slate-400"><i class="fa-solid fa-feather"></i></div>
-                                        <div>
-                                            <strong class="text-slate-800 block text-xs md:text-sm">SAYAP</strong>
-                                            <span class="text-slate-600 block text-[11px] md:text-xs mb-1">Dua sayap melambangkan kebebasan untuk berkembang, kolaborasi, dan tekad untuk terus terbang lebih tinggi.</span>
-                                            <span class="text-[#db2777] italic font-medium text-[10px] md:text-[11px]">“Tak ada penerbangan yang tinggi tanpa sayap yang saling menopang.”</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-3 items-start">
-                                        <div class="text-lg p-1 text-indigo-600"><i class="fa-solid fa-book-open"></i></div>
-                                        <div>
-                                            <strong class="text-slate-800 block text-xs md:text-sm">BUKU TERBUKA</strong>
-                                            <span class="text-slate-600 block text-[11px] md:text-xs mb-1">Buku terbuka menjadi simbol pendidikan, pembelajaran tanpa batas, dan keterbukaan terhadap ilmu serta pengalaman baru.</span>
-                                            <span class="text-[#db2777] italic font-medium text-[10px] md:text-[11px]">“Setiap lembar yang terbuka adalah kesempatan untuk tumbuh dan memberi makna.”</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex gap-3 items-start">
-                                        <div class="text-lg p-1 text-orange-500"><i class="fa-solid fa-palette"></i></div>
-                                        <div>
-                                            <strong class="text-slate-800 block text-xs md:text-sm">GRADASI WARNA EMAS–ORANYE</strong>
-                                            <ul class="list-disc list-inside text-slate-600 text-[11px] md:text-xs space-y-0.5 mt-0.5">
-                                                <li><span class="font-semibold text-slate-700">Emas:</span> Melambangkan kejayaan, kualitas, dan integritas.</li>
-                                                <li><span class="font-semibold text-slate-700">Oranye:</span> Melambangkan semangat, kreativitas, kehangatan, dan energi muda.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        `;
-                    } else if (jenis === 'struktur') {
-        title.innerHTML = '<i class="fa-solid fa-users text-slate-750"></i> <span class="text-slate-800 font-bold tracking-wide text-sm">Struktur Organisasi HIMA PGSD</span>';
-        content.innerHTML = `
-            <div class="space-y-6 text-xs md:text-sm p-0.5">
-                
-                <div class="space-y-2.5">
-                    <h4 class="text-slate-400 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Badan Pengurus Harian (BPH)</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                            <span class="text-slate-600 font-medium">Ketua Himpunan</span>
-                            <span class="text-indigo-700 font-semibold bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg">Husni Mubarok</span>
-                        </div>
-
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                            <span class="text-slate-600 font-medium">Wakil Ketua Himpunan</span>
-                            <span class="text-blue-700 font-semibold bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-lg">Achmad Firas Faishal Firdaos</span>
-                        </div>
-
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                            <span class="text-slate-600 font-medium">Sekretaris Umum</span>
-                            <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Aulia Virgina Nurpita Zahra</span>
-                        </div>
-
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                            <span class="text-slate-600 font-medium">Bendahara Umum</span>
-                            <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Dede Sri Nur Khotimah</span>
-                        </div>
-
-                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                            <span class="text-slate-600 font-medium">Wakil Bendahara</span>
-                            <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Naila Zahrotu Syifa</span>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- DIVISI / DEPARTEMEN -->
-                <div class="space-y-4 pt-1">
-                    <h4 class="text-slate-400 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Departemen & Bidang Kerja</h4>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        <!-- 1. DEPARTEMEN ORGANISASI & KADERISASI -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-users-gear text-slate-500 text-xs"></i>
-                                    <span>Organisasi & Kaderisasi</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Nathania Kirana Felisha</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Azriel Hilmi G.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Avni Awallatunnisa</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Adriansyah</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Puji Astuti</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Ragil Pratama</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Nurlavianita</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 2. DEPARTEMEN PENDIDIKAN -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-graduation-cap text-slate-500 text-xs"></i>
-                                    <span>Pendidikan</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Amelia Nurkhasanah</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Alvina Delianti</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Mega Raya Nur K.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Syahlla Rahma N.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Siti Shofyatun N.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Elsa Nabila K.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Gilang Ramadan</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. DEPARTEMEN MEDINFOKOM -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-bullhorn text-slate-500 text-xs"></i>
-                                    <span>Medinfokom</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Firda Alpiyyatur Rohmah</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Nabila Ramadaniah</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Puja Arifah</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Adinda Rahmawati</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Maulana Akbar</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Hafizh Iqbal F.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Dzulfikar M.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 4. DEPARTEMEN KEAGAMAAN -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-mosque text-slate-500 text-xs"></i>
-                                    <span>Keagamaan</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Hera Haerunnisa</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Naila Maharani</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Devi Permata Sari</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Aas Siti Ainul M.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Mila Kamilatusa'adah</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Siti Nur Azizah</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Rijal Fauzi N.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 5. DEPARTEMEN MINAT BAKAT -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-palette text-slate-500 text-xs"></i>
-                                    <span>Minat Bakat</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Fany Rahmayati</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Fazri Ramdani</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>M. Rangga Wijaya</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Risma Tri H.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Irma Rahmawati</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Tika Nopiani</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Agisda Hayati</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 6. DEPARTEMEN KEMITRAAN & PENGABDIAN -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-handshake-angle text-slate-500 text-xs"></i>
-                                    <span>Kemitraan & Pengabdian</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Yayah Nurhayati</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Indah Sri N.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Farel Gumelar</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Alya Melindarani</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Galih Febrian</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Rehan Aditiya R.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Anis Magfiroh R.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 7. DEPARTEMEN EKRAF -->
-                        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 md:col-span-2 flex flex-col justify-between">
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-2 font-bold text-slate-800 border-b border-slate-100 pb-2">
-                                    <i class="fa-solid fa-lightbulb text-slate-500 text-xs"></i>
-                                    <span>Ekonomi Kreatif</span>
-                                </div>
-                                <div class="flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500 font-medium">Ketua Departemen:</span>
-                                    <span class="font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-md">Tiara Maulidina</span>
-                                </div>
-                            </div>
-                            <div class="text-[11px] space-y-1.5 pt-2">
-                                <div class="text-slate-400 text-[10px] font-semibold">Anggota Departemen:</div>
-                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-1 gap-x-2 text-slate-700 font-normal">
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Ajeng Tri Hapsari</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Eliya Susanti</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Ratih Aulia R.</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Dwi Lestari</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Satria Anggawijaya</div>
-                                    <div class="flex items-center gap-1.5"><span class="w-1 h-1 bg-slate-400 rounded-full"></span>Riyanti Nurhasanah</div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        `;
-                    }
-                }
-            }
-            popup.classList.remove('hidden'); 
-        }
-
-        // PORTAL LOGIN ABSENSI
-        document.getElementById('form-login-absen').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const user = document.getElementById('absen-user-input').value;
-            const pass = document.getElementById('absen-pass-input').value;
-            if (user === "HIMAPGSD" && pass === "pgsdsabubukna") {
-                localStorage.setItem("sesi_absen_firebase_hima", "aktif");
-                bukaAksesFormAbsen();
-            } else { alert("Kredensial Pengurus Salah!"); }
-        });
-
-        if (localStorage.getItem("sesi_absen_firebase_hima") === "aktif") {
-            bukaAksesFormAbsen();
-        }
-
-        function bukaAksesFormAbsen() {
-            document.getElementById('absen-welcome-box').classList.add('hidden');
-            document.getElementById('absen-login-box').classList.add('hidden');
-            document.getElementById('absen-main-box').classList.remove('hidden');
-            dapatkanGPSLive();
-        }
-
-        function dapatkanGPSLive() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((p) => {
-                    userLat = p.coords.latitude; userLon = p.coords.longitude;
-                    document.getElementById('gps-status-text').innerHTML = "<span class='text-pink-500 font-bold'>Satelit GPS Terkunci</span>";
-                    document.getElementById('gps-icon').className = "fa-solid fa-location-dot text-pink-500";
-                    sinkronisasiAturanAdmin();
-                }, (err) => { alert("Akses GPS ditolak! Izinkan lokasi di browser."); });
-            }
-        }
-        document.getElementById('btn-pindai-gps').addEventListener('click', dapatkanGPSLive);
-
-        function hitungJarakMeter(lat1, lon1, lat2, lon2) {
-            const R = 6371e3;
-            const p1 = lat1 * Math.PI/180; const p2 = lat2 * Math.PI/180;
-            const dLat = (lat2-lat1) * Math.PI/180; const dLon = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-        }
-
-        function sinkronisasiAturanAdmin() {
-            const key = document.getElementById('absen-kegiatan').value;
-            const btn = document.getElementById('btn-absen');
-            if (!key || !userLat || !DB_ACARA[key]) return;
-
-            const rule = DB_ACARA[key];
-            document.getElementById('adm-rule-jam').innerText = rule.jam;
-            
-            const jarak = hitungJarakMeter(userLat, userLon, parseFloat(rule.lat), parseFloat(rule.lon));
-            // WARNA DIUBAH: Text -> pink
-            document.getElementById('adm-rule-jarak').innerText = `${Math.round(jarak)}m dari pusat acara`;
-
-            if (jarak <= 500) { 
-                btn.disabled = false; btn.innerText = "Kirim Kehadiran (Masuk Radius)";
-                // WARNA DIUBAH: BG -> pink
-                btn.className = "w-full bg-[#db2777] hover:bg-[#be185d] text-white font-bold text-xs py-4 rounded-xl cursor-pointer transition-all";
-            } else {
-                btn.disabled = true; btn.innerText = "Gagal: Jarak Lebih dari 500m!";
-                btn.className = "w-full bg-rose-600 text-white font-bold text-xs py-4 rounded-xl cursor-not-allowed";
-            }
-        }
-        document.getElementById('absen-kegiatan').addEventListener('change', sinkronisasiAturanAdmin);
-
-        // SUBMIT FORM ABSENSI
-        document.getElementById('form-absen-online').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const agenda = document.getElementById('absen-kegiatan').value;
-            const divisi = document.getElementById('absen-nim').value;
-            const nama = document.getElementById('absen-nama').value;
-
-            try {
-                await addDoc(collection(db, "kehadiranAbsen"), {
-                    nama: nama,
-                    divisi: divisi,
-                    agenda: agenda,
-                    lokasi: `${userLat}, ${userLon}`,
-                    timestamp: Date.now()
-                });
-                alert(`Presensi Berhasil Terkunci!\nNama: ${nama}\nAgenda: ${agenda}`);
-                document.getElementById('form-absen-online').reset();
-                dapatkanGPSLive();
-            } catch(err) { alert("Gagal mengirim presensi: " + err.message); }
-        });
-
-     // SUBMIT FORM ASPIRASI
-document.getElementById('form-aspirasi-online').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // 1. Ambil radio button opsi nama
-    const opsiRadio = document.querySelector('input[name="opsi_nama"]:checked')?.value || 'Anonim';
-    
-    // 2. Tentukan status anonim dan nama pengirim
-    const isAnonim = (opsiRadio !== 'Tulis');
-    let nama = "Anonim";
-    if (!isAnonim) {
-        nama = document.getElementById('aspirasi-nama-user').value.trim() || "Anonim";
-    }
-
-    const kategori = document.getElementById('aspirasi-kategori').value;
-    const pesanAspirasi = document.getElementById('textaspirasi').value.trim();
-
-    // Validasi pesan tidak boleh kosong
-    if (!pesanAspirasi) {
-        alert("Harap isi pesan/saran aspirasi Anda!");
-        return;
-    }
-
-    try {
-        // 3. Kirim ke Firestore dengan struktur field yang dibaca admin
-        await addDoc(collection(db, "aspirasi"), {
-            anonim: isAnonim,       // PENTING: Dibaca admin untuk status anonim (boolean)
-            nama: nama,             // Nama pengirim ("Anonim" atau Input Nama)
-            kategori: kategori,     // Kategori aspirasi
-            isi: pesanAspirasi,     // PENTING: Menggunakan 'isi' agar terbaca di admin.html
-            timestamp: Date.now()   // Waktu pengiriman
-        });
-
-        alert("Aspirasi Anda berhasil terkirim ke HIMA PGSD!");
-
-        // 4. Reset Form & Tampilan
-        document.getElementById('form-aspirasi-online').reset();
-        
-        const charCounter = document.getElementById('char-counter');
-        if (charCounter) charCounter.innerText = "0 / 2000 Karakter";
-
-        const boxNama = document.getElementById('box-nama-pilihan');
-        if (boxNama) boxNama.classList.add('hidden');
-
-    } catch (e) {
-        alert("Gagal mengirim aspirasi: " + e.message);
-    }
-});
-
-        setInterval(() => {
-            const waktu = new Date();
-            const elClock = document.getElementById('live-clock-absen');
-            if(elClock) elClock.innerText = waktu.toLocaleTimeString('id-ID') + " WIB";
-        }, 1000);
-
-        document.getElementById('textaspirasi').addEventListener('input', function() {
-            document.getElementById('char-counter').innerText = `${this.value.length} / 2000 Karakter`;
-        });
-
-        // SLIDER VIDEO CONTROLLER DENGAN DUKUNGAN PLAY/PAUSE DETECTOR
-        let currentSlide = 0;
-        let totalSlides = 0;
-        let sliderInterval;
-        let isVideoPlaying = false;
-
-        onSnapshot(query(collection(db, "videoSosmed"), orderBy("timestamp", "desc")), (snapshot) => {
-            const track = document.getElementById('slider-track-video');
-            const dotsContainer = document.getElementById('slider-dots-video');
-            
-            if (!track) return; 
-            
-            clearInterval(sliderInterval);
-            isVideoPlaying = false;
-
-            if (snapshot.empty) {
-                track.innerHTML = `
-                    <div class="w-full flex-shrink-0 text-center py-20 text-slate-500 text-xs">
-                        <i class="fa-solid fa-video-slash text-xl mb-2 block"></i> Belum ada dokumentasi video yang disematkan.
-                    </div>`;
-                if (dotsContainer) dotsContainer.innerHTML = "";
-                return;
-            }
-
-            let htmlTrack = "";
-            let htmlDots = "";
-            let index = 0;
-            let hasTikTok = false;
-            let hasInstagram = false;
-
-            snapshot.forEach((doc) => {
-                const d = doc.data();
-                let embedCodeRaw = d.embedCode || "";
-
-                if (embedCodeRaw.includes("youtube.com/embed/")) {
-                    if (embedCodeRaw.includes("?")) {
-                        embedCodeRaw = embedCodeRaw.replace('src="https://www.youtube.com/embed/', 'src="https://www.youtube.com/embed/?enablejsapi=1&');
-                    } else {
-                        embedCodeRaw = embedCodeRaw.replace('src="https://www.youtube.com/embed/', 'src="https://www.youtube.com/embed/?enablejsapi=1');
-                    }
-                }
-                
-                if (embedCodeRaw.includes("tiktok.com")) hasTikTok = true;
-                if (embedCodeRaw.includes("instagram.com")) hasInstagram = true;
-
-                htmlTrack += `
-                    <div class="w-full flex-shrink-0 group">
-                        <div class="relative w-full h-80 md:h-[420px] bg-slate-950 flex items-center justify-center overflow-y-auto no-scrollbar p-2">
-                            <div class="w-full h-full max-w-[325px] md:max-w-[380px] mx-auto text-center flex items-center justify-center [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:max-w-full [&_iframe]:max-h-full [&_iframe]:border-0 [&_blockquote]:mx-auto">
-                                ${embedCodeRaw}
-                            </div>
-                        </div>
-                        <div class="p-4 bg-slate-950 text-white border-t border-slate-800">
-                            <span class="text-[10px] font-bold text-amber-400 tracking-wider uppercase">
-                                <i class="fa-solid fa-play animate-pulse"></i> ${d.platform || 'VIDEO'} HIMA MEDIA
-                            </span>
-                            <h3 class="text-xs font-bold text-slate-100 mt-0.5 line-clamp-1">${d.judul}</h3>
-                        </div>
-                    </div>
-                `;
-
-                htmlDots += `<button onclick="goToSlide(${index})" class="w-2 h-2 rounded-full bg-slate-700 transition-all duration-300" id="dot-video-${index}"></button>`;
-                index++;
-            });
-
-            track.innerHTML = htmlTrack;
-            if (dotsContainer) dotsContainer.innerHTML = htmlDots;
-            
-            totalSlides = index;
-            currentSlide = 0;
-            updateSliderPosition();
-
-            if (hasTikTok) {
-                const oldScriptTikTok = document.querySelector('script[src="https://www.tiktok.com/embed.js"]');
-                if (oldScriptTikTok) oldScriptTikTok.remove(); 
-                
-                const scriptTikTok = document.createElement('script');
-                scriptTikTok.src = "https://www.tiktok.com/embed.js";
-                scriptTikTok.async = true;
-                document.body.appendChild(scriptTikTok);
-            }
-
-            if (hasInstagram) {
-                const oldScriptIG = document.querySelector('script[src="//www.instagram.com/embed.js"]');
-                if (oldScriptIG) oldScriptIG.remove();
-
-                const scriptIG = document.createElement('script');
-                scriptIG.src = "//www.instagram.com/embed.js";
-                scriptIG.async = true;
-                
-                scriptIG.onload = function() {
-                    if (window.instgrm && window.instgrm.Embeds) {
-                        window.instgrm.Embeds.process();
-                    }
-                };
-                document.body.appendChild(scriptIG);
-
-                setTimeout(() => {
-                    if (window.instgrm && window.instgrm.Embeds) {
-                        window.instgrm.Embeds.process();
-                    }
-                }, 400);
-            }
-
-            startSliderInterval();
-        });
-
-        function startSliderInterval() {
-            clearInterval(sliderInterval);
-            sliderInterval = setInterval(() => {
-                if (!isVideoPlaying && totalSlides > 1) {
-                    currentSlide = (currentSlide + 1) % totalSlides;
-                    updateSliderPosition();
-                }
-            }, 6000);
-        }
-
-        function updateSliderPosition() {
-            const track = document.getElementById('slider-track-video');
-            if (track) {
-                track.style.transform = `translateX(-${currentSlide * 100}%)`;
-            }
-            
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.getElementById(`dot-video-${i}`);
-                if (dot) {
-                    if (i === currentSlide) {
-                        dot.classList.remove('bg-slate-700', 'w-2');
-                        dot.classList.add('bg-pink-500', 'w-4');
-                    } else {
-                        dot.classList.remove('bg-pink-500', 'w-4');
-                        dot.classList.add('bg-slate-700', 'w-2');
-                    }
-                }
-            }
-        }
-
-        window.goToSlide = function(index) {
-            currentSlide = index;
-            updateSliderPosition();
-            startSliderInterval();
-        };
-
-        window.addEventListener('message', function(event) {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.event === 'infoDelivery' && data.info) {
-                    if (data.info.playerState === 1) { 
-                        isVideoPlaying = true;
-                    } else if (data.info.playerState === 2 || data.info.playerState === 0) { 
-                        isVideoPlaying = false;
-                    }
-                }
-            } catch (e) {}
-
-            if (event.origin.includes("tiktok.com") && event.data) {
-                if (event.data.type === 'play') isVideoPlaying = true;
-                if (event.data.type === 'pause' || event.data.type === 'ended') isVideoPlaying = false;
-            }
-
-            if (event.origin.includes("instagram.com") && event.data) {
-                if (event.data.type === 'reelsPlay' || event.data.action === 'play') isVideoPlaying = true;
-                if (event.data.type === 'reelsPause' || event.data.action === 'pause') isVideoPlaying = false;
-            }
-        });
-
-        if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-            const tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIMA PGSD - Universitas Muhammadiyah Kuningan (Firebase)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1495,7 +71,6 @@ document.getElementById('form-aspirasi-online').addEventListener('submit', async
             </div>
 
             <div class="border-t border-slate-100 p-4 bg-slate-50 flex justify-between items-center">
-                <!-- FITUR TAMBAHAN: Tombol Bagikan di Modal Detail -->
                 <div id="popup-share-actions" class="hidden flex items-center gap-2">
                     <button id="btn-share-modal-wa" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg text-xs flex items-center gap-1.5 shadow-sm transition-all">
                         <i class="fa-brands fa-whatsapp text-sm"></i> Bagikan WA
@@ -1562,7 +137,6 @@ document.getElementById('form-aspirasi-online').addEventListener('submit', async
 
     <section id="absen" class="bg-slate-50 py-16 px-4 md:px-6 border-y border-slate-200">
         <div class="max-w-4xl mx-auto">
-            
             <div id="absen-welcome-box" class="bg-white p-8 md:p-12 rounded-3xl shadow-xl max-w-xl mx-auto border border-slate-200 text-center space-y-6 transition-all duration-300">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                     <div class="flex items-center space-x-2">
@@ -2042,7 +616,6 @@ document.getElementById('form-aspirasi-online').addEventListener('submit', async
                 beritaFrontPage.forEach((item, index) => {
                     const imgUrl = item.gambar && item.gambar.trim() !== "" ? item.gambar : 'https://via.placeholder.com/400x250?text=HIMA+PGSD';
                     
-                    // ESCAPING STRING UNTUK FUNCTION CALL
                     const judulSafe = (item.judul || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
                     const isiSafe = (item.isi || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
 
@@ -2060,7 +633,6 @@ document.getElementById('form-aspirasi-online').addEventListener('submit', async
                                         <span>Baca Selengkapnya</span><i class="fa-solid fa-arrow-right text-[10px]"></i>
                                     </button>
                                     
-                                    <!-- TOMBOL BAGIKAN DENGAN IKON DI KARTU -->
                                     <div class="flex items-center gap-1.5">
                                         <button onclick="bagikanKeWA('${judulSafe}', '${isiSafe}')" title="Bagikan ke WhatsApp" class="w-7 h-7 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-600 flex items-center justify-center transition-colors text-xs">
                                             <i class="fa-brands fa-whatsapp"></i>
@@ -2192,7 +764,6 @@ document.getElementById('form-aspirasi-online').addEventListener('submit', async
                     imgContainer.classList.remove('hidden');
                 }
 
-                // AKTIFKAN FITUR BAGIKAN PADA MODAL DETAIL
                 shareActions.classList.remove('hidden');
                 document.getElementById('btn-share-modal-wa').onclick = () => window.bagikanKeWA(dataDinamis.judul, dataDinamis.isi);
                 document.getElementById('btn-share-modal-link').onclick = () => window.salinTautanBerita(dataDinamis.judul);
@@ -2332,33 +903,194 @@ document.getElementById('form-aspirasi-online').addEventListener('submit', async
                             </div>
                         `;
                     } else if (jenis === 'struktur') {
-                        title.innerHTML = '<i class="fa-solid fa-users text-slate-750"></i> <span class="text-slate-800 font-bold tracking-wide text-sm">Struktur Organisasi HIMA PGSD</span>';
+                        title.innerHTML = '<i class="fa-solid fa-users text-slate-750"></i> <span class="text-slate-800 font-bold tracking-wide text-sm">Struktur Organisasi HIMA PGSD Periode 2026-2027</span>';
                         content.innerHTML = `
                             <div class="space-y-6 text-xs md:text-sm p-0.5">
+                                <!-- Badan Pengurus Harian (BPH) -->
                                 <div class="space-y-2.5">
-                                    <h4 class="text-slate-400 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Badan Pengurus Harian (BPH)</h4>
+                                    <h4 class="text-pink-600 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Badan Pengurus Harian (BPH)</h4>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                                            <span class="text-slate-600 font-medium">Ketua Himpunan</span>
+                                            <span class="text-slate-600 font-medium">Ketua Hima</span>
                                             <span class="text-indigo-700 font-semibold bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg">Husni Mubarok</span>
                                         </div>
                                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
-                                            <span class="text-slate-600 font-medium">Wakil Ketua Himpunan</span>
+                                            <span class="text-slate-600 font-medium">Wakil Ketua</span>
                                             <span class="text-blue-700 font-semibold bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-lg">Achmad Firas Faishal Firdaos</span>
                                         </div>
                                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
                                             <span class="text-slate-600 font-medium">Sekretaris Umum</span>
                                             <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Aulia Virgina Nurpita Zahra</span>
                                         </div>
-                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
                                             <span class="text-slate-600 font-medium">Bendahara Umum</span>
                                             <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Dede Sri Nur Khotimah</span>
                                         </div>
-                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center sm:col-span-2">
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
                                             <span class="text-slate-600 font-medium">Wakil Bendahara</span>
                                             <span class="text-emerald-700 font-semibold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">Naila Zahrotu Syifa</span>
                                         </div>
                                     </div>
+                                </div>
+
+                                <!-- Departemen / Divisi Internal -->
+                                <div class="space-y-6">
+                                    <h4 class="text-pink-600 font-bold tracking-wider text-[10px] uppercase border-b pb-1">Departemen & Divisi Internal</h4>
+                                    
+                                    <!-- 1. Organisasi & Kaderisasi -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-pink-500">Departemen Organisasi & Kaderisasi</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Nathania Kirana Felisha</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Azriel Hilmi Guspazri</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Avni awallatunnisa</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Adriansyah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Puji astuti</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Muhammad ragil pratama</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Nurlavianita</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2. Pendidikan -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-indigo-500">Departemen Pendidikan</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Amelia Nurkhasanah</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Alvina Delianti</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Mega Raya Nur Khalifah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Rijal Fauzi Nurwahid</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Syahlla Rahma Nurjihan</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Siti Shofyatun Nurwahidah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Elsa Nabila Khairunisa</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 3. Medinfokom -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-cyan-500">Departemen Medinfokom</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Firda Alpiyyatur Rohmah</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Nabila Ramadaniah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Puja Arifah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Adinda Rahmawati</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Maulana Akbar</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Hafizh Iqbal Faturochman</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Muhammad Dzulfikar Maulana</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. Keagamaan -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-emerald-500">Departemen Keagamaan</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Hera Haerunnisa</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Naila Maharani</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Devi Permata Sari</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Aas Siti Ainul Muawanah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Mila Kamilatusa'adah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Siti Nur Azizah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Gilang Ramadan</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 5. Pengembangan Minat Bakat -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-amber-500">Departemen Pengembangan Minat Bakat</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Fany Rahmayati</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Muhammad Fazri Ramdani</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Muhammad Rangga Wijaya</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Risma Tri Harmayanti</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Irma Rahmawati</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Tika Nopiani</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Agisda Hayati</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 6. Kemitraan & Pengabdian -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-blue-500">Departemen Kemitraan & Pengabdian</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Yayah Nurhayati</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Indah Sri Nurjannah</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Farel Gumelar</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Alya Melindarani</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Galih Febrian</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Rehan Aditiya Ramadhan</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Anis Magfiroh Ramadhani</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 7. Ekraf -->
+                                    <div class="space-y-2">
+                                        <span class="text-slate-800 font-bold text-xs uppercase tracking-wide block bg-slate-100 px-3 py-1.5 rounded-lg border-l-4 border-rose-500">Departemen Ekraf</span>
+                                        
+                                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex justify-between items-center">
+                                            <span class="text-slate-600 font-medium">Ketua Bidang</span>
+                                            <span class="text-purple-700 font-semibold bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg">Tiara Maulidina</span>
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-xl border border-slate-200/60 space-y-2">
+                                            <span class="text-slate-500 font-semibold text-[11px] uppercase tracking-wider block border-b border-slate-100 pb-1">Anggota</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Ajeng Tri Hapsari</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Eliya Susanti</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Ratih Aulia Rahmayana</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Dwi Lestari</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Satria Anggawijaya</div>
+                                                <div class="text-slate-700 font-medium bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs">Riyanti Nurhasanah</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         `;
