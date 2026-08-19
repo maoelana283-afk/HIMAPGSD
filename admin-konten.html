@@ -7,17 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- LIBRARY SHEETJS UNTUK EXPORT EXCEL (.XLSX) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; transition: background 0.5s ease-in-out; }
         
-        /* BACKGROUND 1: HALAMAN LOGIN */
         .bg-login-state {
             background: linear-gradient(rgba(15, 23, 42, 0.05), rgba(245, 158, 11, 0.02)), 
                         url('bg-admin.jpeg') no-repeat center center fixed;
             background-size: cover;
         }
 
-        /* BACKGROUND 2: HALAMAN DASHBOARD */
         .bg-dashboard-state {
             background: linear-gradient(rgba(11, 15, 25, 0.5), rgba(15, 23, 42, 0.5)), 
                         url('background.jpeg') no-repeat center center fixed;
@@ -25,7 +25,6 @@
             background-attachment: fixed;
         }
 
-        /* EFEK TRANSPARAN GLASSMORPHISM */
         .glass-panel {
             background-color: rgba(15, 23, 42, 0.35); 
             backdrop-filter: blur(12px);
@@ -40,14 +39,9 @@
             background-color: rgba(15, 23, 42, 0.6) !important;
         }
 
-        /* Style Khusus Cetak / Print PDF */
         @media print {
-            body * { 
-                visibility: hidden !important; 
-            }
-            #cetak-area, #cetak-area * { 
-                visibility: visible !important; 
-            }
+            body * { visibility: hidden !important; }
+            #cetak-area, #cetak-area * { visibility: visible !important; }
             #cetak-area { 
                 display: block !important;
                 position: absolute !important; 
@@ -59,32 +53,23 @@
                 background: #ffffff !important; 
                 color: #000000 !important; 
             }
-            .no-print { 
-                display: none !important; 
-            }
-            @page {
-                size: A4 portrait;
-                margin: 1.5cm;
-            }
-            thead {
-                display: table-header-group;
-            }
-            tr {
-                page-break-inside: avoid;
-            }
+            .no-print { display: none !important; }
+            @page { size: A4 portrait; margin: 1.5cm; }
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; }
         }
     </style>
 </head>
 <body class="bg-login-state text-slate-100 min-h-screen flex items-center justify-center p-4">
 
-    <!-- PANEL LOGIN TRANSPARAN TANPA BLUR -->
+    <!-- PANEL LOGIN -->
     <div id="login-panel" class="bg-slate-950/30 p-8 rounded-2xl border border-slate-400/30 shadow-2xl w-full max-w-md relative z-10">
         <div class="text-center mb-6">
             <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-amber-500/20 text-amber-300 mb-3 border border-amber-500/30">
                 <i class="fa-solid fa-shield-halved text-xl"></i>
             </div>
             <h2 class="text-xl font-bold drop-shadow-md">Autentikasi Pengurus</h2>
-            <p class="text-xs text-slate-300 mt-1 drop-shadow">HIMA PGSD UMKU Kuningan</p>
+            <p class="text-xs text-slate-300 mt-1 drop-shadow">HIMA PGSD Periode 2026-2027</p>
         </div>
         <form id="form-login" class="space-y-4">
             <div>
@@ -99,7 +84,7 @@
         </form>
     </div>
 
-    <!-- DASHBOARD PANEL TEMBUS PANDANG -->
+    <!-- DASHBOARD PANEL -->
     <div id="dashboard-panel" class="hidden w-full max-w-6xl glass-panel p-6 md:p-8 rounded-2xl border border-slate-500/30 shadow-2xl space-y-6 my-8">
         <div class="flex justify-between items-center border-b border-slate-500/30 pb-4">
             <div class="flex items-center gap-2.5">
@@ -109,7 +94,7 @@
             <button id="btn-logout" class="bg-red-600/70 hover:bg-red-500 text-white text-xs px-3 py-2 rounded-lg font-semibold shadow-sm transition-colors border border-red-500/40">Keluar</button>
         </div>
 
-        <!-- PANEL MONITORING ABSENSI / PRESENSI PESERTA -->
+        <!-- PANEL MONITORING ABSENSI -->
         <div id="section-absensi" class="glass-card p-5 rounded-xl border border-slate-500/20 space-y-4 hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-slate-500/20">
                 <div>
@@ -124,25 +109,40 @@
                     <select id="filter-agenda-rekap" class="text-xs glass-input border border-slate-500/40 rounded-lg px-3 py-1.5 text-amber-300 focus:outline-none font-semibold">
                         <option value="SEMUA" class="bg-slate-900 text-white">-- Semua Agenda --</option>
                     </select>
+                    <button onclick="exportAbsenExcel()" class="bg-emerald-700/80 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all border border-emerald-500/30 flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel Absen
+                    </button>
                     <button onclick="cetakSemuaAbsen()" class="bg-slate-700/80 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all border border-slate-500/30 flex items-center gap-1.5">
-                        <i class="fa-solid fa-print"></i> Cetak Semua
+                        <i class="fa-solid fa-print"></i> Cetak Rekap
                     </button>
                 </div>
             </div>
+
+            <!-- TAB FILTER STATUS PRESENSI -->
+            <div class="flex items-center gap-2 border-b border-slate-700/50 pb-2 text-xs">
+                <button onclick="setTabFilterStatus('SEMUA')" id="btn-tab-semua" class="px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition-all">
+                    Semua (<span id="cnt-semua">0</span>)
+                </button>
+                <button onclick="setTabFilterStatus('HADIR')" id="btn-tab-hadir" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-emerald-400 hover:bg-slate-700 transition-all">
+                    Hadir (<span id="cnt-hadir">0</span>)
+                </button>
+                <button onclick="setTabFilterStatus('TIDAK_HADIR')" id="btn-tab-tidak-hadir" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-rose-400 hover:bg-slate-700 transition-all">
+                    Belum / Tidak Hadir (<span id="cnt-tidak-hadir">0</span>)
+                </button>
+            </div>
             
-            <!-- CONTAINER DINAMIS PRESENSI -->
             <div id="container-monitoring-presensi">
                 <div class="overflow-x-auto rounded-lg border border-slate-600/30">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-slate-900/80 text-slate-200 border-b border-slate-600/40 uppercase font-semibold text-[11px]">
                             <tr>
-                                <th class="p-3 border-r border-slate-600/30 w-36">Waktu Masuk</th>
-                                <th class="p-3 border-r border-slate-600/30">Nama Lengkap</th>
-                                <th class="p-3 border-r border-slate-600/30 w-32">Divisi / NIM</th>
-                                <th id="th-kolom-agenda" class="p-3 border-r border-slate-600/30">Agenda Acara</th>
-                                <th class="p-3 border-r border-slate-600/30 text-center w-28">Koordinat</th>
-                                <th class="p-3 border-r border-slate-600/30 text-center w-28">Status</th>
-                                <th class="p-3 w-44 text-center">Tindakan</th>
+                                <th class="p-3 border-r border-slate-600/30 text-center w-12">NO</th>
+                                <th class="p-3 border-r border-slate-600/30 w-36">WAKTU MASUK</th>
+                                <th class="p-3 border-r border-slate-600/30">NAMA LENGKAP</th>
+                                <th class="p-3 border-r border-slate-600/30 w-44">DIVISI / NIM</th>
+                                <th class="p-3 border-r border-slate-600/30 text-center w-40">KOORDINAT</th>
+                                <th class="p-3 border-r border-slate-600/30 text-center w-28">STATUS</th>
+                                <th class="p-3 w-40 text-center">TINDAKAN</th>
                             </tr>
                         </thead>
                         <tbody id="tabel-rekap-absen" class="bg-slate-950/20 divide-y divide-slate-700/30">
@@ -157,7 +157,12 @@
 
         <!-- PANEL MONITORING ASPIRASI -->
         <div id="section-aspirasi" class="glass-card p-5 rounded-xl border border-slate-500/20 space-y-4 hidden">
-            <h3 class="text-sm font-bold text-indigo-300 drop-shadow"><i class="fa-solid fa-comments mr-1.5"></i>MONITORING ASPIRASI MAHASISWA</h3>
+            <div class="flex justify-between items-center pb-2 border-b border-slate-500/20">
+                <h3 class="text-sm font-bold text-indigo-300 drop-shadow"><i class="fa-solid fa-comments mr-1.5"></i>MONITORING ASPIRASI MAHASISWA</h3>
+                <button onclick="exportAspirasiExcel()" class="bg-emerald-700/80 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all border border-emerald-500/30 flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-excel"></i> Export Excel Aspirasi
+                </button>
+            </div>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border border-slate-600/30">
@@ -182,37 +187,40 @@
         <div id="section-jadwal" class="glass-card p-5 rounded-xl border border-slate-500/20 space-y-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <h3 class="text-sm font-bold text-amber-300 drop-shadow flex items-center gap-1.5">
-                    <i class="fa-solid fa-clock"></i> PENGATURAN AGENDA & TARGET PRESENSI
+                    <i class="fa-solid fa-clock"></i> PENGATURAN AGENDA & WAKTU TOLERANSI
                 </h3>
                 <button type="button" id="btn-dapatkan-gps-admin" class="bg-slate-800/80 hover:bg-slate-700 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-amber-500/30 transition-all flex items-center gap-1.5 self-start md:self-auto">
                     <i class="fa-solid fa-location-crosshairs"></i> Ambil Lokasi GPS Saya
                 </button>
             </div>
 
-            <!-- FORM JADWAL: MENAMBAHKAN TANGGAL AGENDA -->
-            <form id="form-jadwal-absen" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
-                <div>
+            <form id="form-jadwal-absen" class="grid grid-cols-1 md:grid-cols-6 gap-3 text-xs">
+                <div class="md:col-span-2">
                     <label class="block text-slate-300 mb-1 font-semibold">Nama Agenda / Acara</label>
-                    <input type="text" id="adm-nama-acara" placeholder="Contoh: Rapat Pleno 1" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
+                    <input type="text" id="adm-nama-acara" placeholder="Contoh: Rapat Persiapan Himavers" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
                 </div>
                 <div>
                     <label class="block text-slate-300 mb-1 font-semibold">Tanggal Agenda</label>
                     <input type="date" id="adm-tgl-acara" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
                 </div>
                 <div>
-                    <label class="block text-slate-300 mb-1 font-semibold">Target Jam Mulai (WIB)</label>
+                    <label class="block text-slate-300 mb-1 font-semibold">Waktu Kumpul (WIB)</label>
                     <input type="time" id="adm-jam-acara" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
                 </div>
                 <div>
-                    <label class="block text-slate-300 mb-1 font-semibold">Latitude GPS</label>
-                    <input type="text" id="adm-lat-acara" placeholder="-6.97711" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
+                    <label class="block text-amber-300 mb-1 font-semibold">Toleransi (Menit)</label>
+                    <input type="number" id="adm-toleransi-acara" placeholder="20" min="0" value="20" class="w-full p-2.5 glass-input border border-amber-500/50 text-amber-300 font-bold rounded focus:outline-none focus:border-amber-400" required>
                 </div>
                 <div>
-                    <label class="block text-slate-300 mb-1 font-semibold">Longitude GPS</label>
-                    <input type="text" id="adm-lon-acara" placeholder="108.49072" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
+                    <label class="block text-slate-300 mb-1 font-semibold">Latitude GPS</label>
+                    <input type="text" id="adm-lat-acara" placeholder="-6.9749" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
                 </div>
-                <div class="md:col-span-5 flex justify-end">
-                    <button type="submit" class="bg-amber-500/90 text-slate-950 font-bold px-6 py-2.5 rounded-lg hover:bg-amber-400 transition-colors border border-amber-400/40 flex items-center gap-1.5">
+                <div class="md:col-span-2">
+                    <label class="block text-slate-300 mb-1 font-semibold">Longitude GPS</label>
+                    <input type="text" id="adm-lon-acara" placeholder="108.4695" class="w-full p-2.5 glass-input border border-slate-600/40 text-white rounded focus:outline-none focus:border-amber-500/50" required>
+                </div>
+                <div class="md:col-span-4 flex justify-end items-end">
+                    <button type="submit" class="w-full md:w-auto bg-amber-500/90 text-slate-950 font-bold px-6 py-2.5 rounded-lg hover:bg-amber-400 transition-colors border border-amber-400/40 flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan Target Agenda
                     </button>
                 </div>
@@ -225,8 +233,9 @@
                         <thead class="bg-slate-900/60 text-slate-200 border-b border-slate-600/40 uppercase font-semibold">
                             <tr>
                                 <th class="p-2.5 border-r border-slate-600/30">Nama Agenda Acara</th>
-                                <th class="p-2.5 border-r border-slate-600/30 w-36">Hari & Tanggal</th>
-                                <th class="p-2.5 border-r border-slate-600/30 w-28">Target Jam</th>
+                                <th class="p-2.5 border-r border-slate-600/30 w-32">Hari & Tanggal</th>
+                                <th class="p-2.5 border-r border-slate-600/30 w-28">Jam Kumpul</th>
+                                <th class="p-2.5 border-r border-slate-600/30 w-28 text-center">Batas Toleransi</th>
                                 <th class="p-2.5 border-r border-slate-600/30">Koordinat (Lat, Lon)</th>
                                 <th class="p-2.5 border-r border-slate-600/30 text-center w-28">Status Agenda</th>
                                 <th class="p-2.5 w-24 text-center">Aksi</th>
@@ -234,7 +243,7 @@
                         </thead>
                         <tbody id="tabel-jadwal-absen" class="bg-slate-950/20 divide-y divide-slate-700/30">
                             <tr>
-                                <td colspan="6" class="p-3 text-center text-slate-400 italic">Memuat target agenda...</td>
+                                <td colspan="7" class="p-3 text-center text-slate-400 italic">Memuat target agenda...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -352,7 +361,7 @@
         <div id="cetak-konten" class="space-y-4 text-xs"></div>
     </div>
 
-    <!-- MAIN SINGLE FIREBASE MODULE SCRIPT -->
+    <!-- MAIN FIREBASE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -370,14 +379,72 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // MASTER DATA ANGGOTA HIMA PGSD
+        const MASTER_ANGGOTA_HIMA = [
+            { nama: "Husni Mubarok", divisi: "Ketua HIMA" },
+            { nama: "Achmad Firas Faishal Firdaos", divisi: "Wakil Ketua HIMA" },
+            { nama: "Aulia Virgina Nurpita Zahra", divisi: "Sekretaris Umum" },
+            { nama: "Dede Sri Nur Khotimah", divisi: "Bendahara Umum" },
+            { nama: "Naila Zahrotu Syifa", divisi: "Wakil Bendahara" },
+            { nama: "Nathania Kirana Felisha", divisi: "Ketua Dept. Organisasi & Kaderisasi" },
+            { nama: "Azriel Hilmi Guspazri", divisi: "Dept. Organisasi & Kaderisasi" },
+            { nama: "Avni awallatunnisa", divisi: "Dept. Organisasi & Kaderisasi" },
+            { nama: "Adriansyah", divisi: "Dept. Organisasi & Kaderisasi" },
+            { nama: "Puji astuti", divisi: "Dept. Organisasi & Kaderisasi" },
+            { nama: "Muhammad ragil pratama", divisi: "Dept. Organisasi & Kaderisasi" },
+            { nama: "Nurlavianita", divisi: "Dept. Organisasi & Kaderisasi" },
+            { nama: "Amelia Nurkhasanah", divisi: "Ketua Dept. Pendidikan" },
+            { nama: "Alvina Delianti", divisi: "Dept. Pendidikan" },
+            { nama: "Mega Raya Nur Khalifah", divisi: "Dept. Pendidikan" },
+            { nama: "Rijal Fauzi Nurwahid", divisi: "Dept. Pendidikan" },
+            { nama: "Syahlla Rahma Nurjihan", divisi: "Dept. Pendidikan" },
+            { nama: "Siti Shofyatun Nurwahidah", divisi: "Dept. Pendidikan" },
+            { nama: "Elsa Nabila Khairunisa", divisi: "Dept. Pendidikan" },
+            { nama: "Firda Alpiyyatur Rohmah", divisi: "Ketua Dept. Medinfokom" },
+            { nama: "Nabila Ramadaniah", divisi: "Dept. Medinfokom" },
+            { nama: "Puja Arifah", divisi: "Dept. Medinfokom" },
+            { nama: "Adinda Rahmawati", divisi: "Dept. Medinfokom" },
+            { nama: "Maulana Akbar", divisi: "Dept. Medinfokom" },
+            { nama: "Hafizh Iqbal Faturochman", divisi: "Dept. Medinfokom" },
+            { nama: "Muhammad Dzulfikar Maulana", divisi: "Dept. Medinfokom" },
+            { nama: "Hera Haerunnisa", divisi: "Ketua Dept. Keagamaan" },
+            { nama: "Naila Maharani", divisi: "Dept. Keagamaan" },
+            { nama: "Devi Permata Sari", divisi: "Dept. Keagamaan" },
+            { nama: "Aas Siti Ainul Muawanah", divisi: "Dept. Keagamaan" },
+            { nama: "Mila Kamilatusa'adah", divisi: "Dept. Keagamaan" },
+            { nama: "Siti Nur Azizah", divisi: "Dept. Keagamaan" },
+            { nama: "Gilang Ramadan", divisi: "Dept. Keagamaan" },
+            { nama: "Fany Rahmayati", divisi: "Ketua Dept. Peng. Minat Bakat" },
+            { nama: "Muhammad Fazri Ramdani", divisi: "Dept. Peng. Minat Bakat" },
+            { nama: "Muhammad Rangga Wijaya", divisi: "Dept. Peng. Minat Bakat" },
+            { nama: "Risma Tri Harmayanti", divisi: "Dept. Peng. Minat Bakat" },
+            { nama: "Irma Rahmawati", divisi: "Dept. Peng. Minat Bakat" },
+            { nama: "Tika Nopiani", divisi: "Dept. Peng. Minat Bakat" },
+            { nama: "Agisda Hayati", divisi: "Dept. Peng. Minat Bakat" },
+            { nama: "Yayah Nurhayati", divisi: "Ketua Dept. Kemitraan & Pengabdian" },
+            { nama: "Indah Sri Nurjannah", divisi: "Dept. Kemitraan & Pengabdian" },
+            { nama: "Farel Gumelar", divisi: "Dept. Kemitraan & Pengabdian" },
+            { nama: "Alya Melindarani", divisi: "Dept. Kemitraan & Pengabdian" },
+            { nama: "Galih Febrian", divisi: "Dept. Kemitraan & Pengabdian" },
+            { nama: "Rehan Aditiya Ramadhan", divisi: "Dept. Kemitraan & Pengabdian" },
+            { nama: "Anis Magfiroh Ramadhani", divisi: "Dept. Kemitraan & Pengabdian" },
+            { nama: "Tiara Maulidina", divisi: "Ketua Dept. Ekraf" },
+            { nama: "Ajeng Tri Hapsari", divisi: "Dept. Ekraf" },
+            { nama: "Eliya Susanti", divisi: "Dept. Ekraf" },
+            { nama: "Ratih Aulia Rahmayana", divisi: "Dept. Ekraf" },
+            { nama: "Dwi Lestari", divisi: "Dept. Ekraf" },
+            { nama: "Satria Anggawijaya", divisi: "Dept. Ekraf" },
+            { nama: "Riyanti Nurhasanah", divisi: "Dept. Ekraf" }
+        ];
+
         let currentRole = "";
         let base64ImageString = "";
         let listBeritaLokal = [];
         let listAspirasiLokal = [];
         let DATA_REKAP_GLOBAL = [];
         let DATA_JADWAL_GLOBAL = [];
+        let TAB_STATUS_AKTIF = "SEMUA";
 
-        // FUNGSI KATEGORI (DILETAKkAN DI ATAS SEBELUM DIEKSPOR KE WINDOW)
         function handleKategoriChange(val) {
             const embedBox = document.getElementById('container-embed-code');
             const uploadBox = document.getElementById('container-gambar-upload');
@@ -411,30 +478,53 @@
         window.cetakSemuaAbsen = cetakSemuaAbsen;
         window.hapusJadwalAcara = hapusJadwalAcara;
         window.pilihAgenda = pilihAgenda;
+        window.setTabFilterStatus = setTabFilterStatus;
+        window.ingatkanAbsenWA = ingatkanAbsenWA;
+        window.exportAbsenExcel = exportAbsenExcel;
+        window.exportAspirasiExcel = exportAspirasiExcel;
 
-        // FUNGSI LOGIKA VALIDASI KADALUARSA DAN KETERLAMBATAN AGENDA
-        function cekStatusAgendaAktif(tglStr, jamStr) {
-            if (!tglStr) return { isExpired: false, isTerlambat: false };
+        function setTabFilterStatus(tab) {
+            TAB_STATUS_AKTIF = tab;
+            const btnSemua = document.getElementById('btn-tab-semua');
+            const btnHadir = document.getElementById('btn-tab-hadir');
+            const btnTidakHadir = document.getElementById('btn-tab-tidak-hadir');
 
-            const targetDateTime = new Date(`${tglStr}T${jamStr || '23:59'}:00`);
-            const skrg = new Date();
-
-            const hariSkrg = new Date(skrg.getFullYear(), skrg.getMonth(), skrg.getDate());
-            const hariAcara = new Date(targetDateTime.getFullYear(), targetDateTime.getMonth(), targetDateTime.getDate());
-
-            if (hariSkrg > hariAcara) {
-                return { isExpired: true, isTerlambat: true, label: "Kadaluarsa" };
+            if(btnSemua && btnHadir && btnTidakHadir) {
+                btnSemua.className = tab === 'SEMUA' ? "px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 transition-all" : "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all";
+                btnHadir.className = tab === 'HADIR' ? "px-3 py-1.5 rounded-lg font-bold bg-emerald-500 text-slate-950 transition-all" : "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-emerald-400 hover:bg-slate-700 transition-all";
+                btnTidakHadir.className = tab === 'TIDAK_HADIR' ? "px-3 py-1.5 rounded-lg font-bold bg-rose-500 text-white transition-all" : "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-rose-400 hover:bg-slate-700 transition-all";
             }
-
-            return { isExpired: false, isTerlambat: false, label: "Aktif" };
+            renderTabelRekap();
         }
 
-        function cekKeterlambatan(msWaktuAbsen, targetJamStr, targetTglStr) {
-            if (!targetJamStr) return { isTerlambat: false, label: "Tepat Waktu" };
+        function ingatkanAbsenWA(namaAnggota, divisi) {
+            const filter = document.getElementById('filter-agenda-rekap')?.value || 'Agenda HIMA';
+            const teksWA = `*PENGINGAT PRESENSI HIMA PGSD*\n\n` +
+                           `Halo Sdr/i *${namaAnggota}* (${divisi}),\n` +
+                           `Anda tercatat *BELUM MELAKUKAN PRESENSI* pada agenda: *${filter}*.\n\n` +
+                           `Sesi presensi dibatasi maksimal 1.5 jam (90 menit) setelah acara dimulai. Mohon segera mengisi absensi melalui sistem web HIMA PGSD. Terima kasih!`;
+            const urlShare = `https://api.whatsapp.com/send?text=${encodeURIComponent(teksWA)}`;
+            window.open(urlShare, '_blank');
+        }
+
+        function cekStatusAgendaAktif(tglStr, jamStr) {
+            if (!tglStr) return { isExpired: false, label: "Aktif" };
+            const targetDateTime = new Date(`${tglStr}T${jamStr || '23:59'}:00`);
+            const batasBukaPenuh = new Date(targetDateTime.getTime() + (90 * 60 * 1000));
+            const skrg = new Date();
+
+            if (skrg > batasBukaPenuh) {
+                return { isExpired: true, label: "Kadaluarsa" };
+            }
+            return { isExpired: false, label: "Aktif" };
+        }
+
+        function cekKeterlambatan(msWaktuAbsen, targetJamStr, targetTglStr, menitToleransi = 20) {
+            if (!targetJamStr) return { isTerlambat: false, isExpired: false, label: "Tepat Waktu", batasMenit: "--:--" };
 
             const dateAbsen = new Date(msWaktuAbsen);
-            
             let targetDate;
+            
             if (targetTglStr) {
                 targetDate = new Date(`${targetTglStr}T${targetJamStr}:00`);
             } else {
@@ -443,13 +533,120 @@
                 targetDate.setHours(targetHours, targetMinutes, 0, 0);
             }
 
-            if (dateAbsen > targetDate) {
-                return { isTerlambat: true, label: "Terlambat" };
+            const toleransiMs = parseInt(menitToleransi || 0) * 60 * 1000;
+            const batasToleransiDate = new Date(targetDate.getTime() + toleransiMs);
+            const batasMaksimalSesi = new Date(targetDate.getTime() + (90 * 60 * 1000)); 
+
+            const strBatasToleransi = batasToleransiDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+
+            if (dateAbsen > batasMaksimalSesi) {
+                return { isTerlambat: true, isExpired: true, label: "Tidak Hadir (>1.5 Jam)", batasMenit: strBatasToleransi };
             }
-            return { isTerlambat: false, label: "Tepat Waktu" };
+            else if (dateAbsen > batasToleransiDate) {
+                return { isTerlambat: true, isExpired: false, label: "Terlambat", batasMenit: strBatasToleransi };
+            }
+            
+            return { isTerlambat: false, isExpired: false, label: "Tepat Waktu", batasMenit: strBatasToleransi };
         }
 
-        // AUTO-KOMPRES GAMBAR BERBASIS CANVAS
+        // EXPORT REKAP PRESENSI KE EXCEL DENGAN NAMA ACARA SAMA PERSIS DENGAN SETTING
+        function exportAbsenExcel() {
+            const filter = document.getElementById('filter-agenda-rekap').value;
+            const filteredAgenda = DATA_JADWAL_GLOBAL.find(a => a.id === filter);
+            const nowStr = new Date().toLocaleString('id-ID');
+            
+            let dataTable = [];
+
+            if (filter === "SEMUA") {
+                DATA_REKAP_GLOBAL.forEach((item, index) => {
+                    let msWaktu = item.timestamp || Date.now();
+                    if (typeof msWaktu === 'object' && msWaktu.toMillis) msWaktu = msWaktu.toMillis();
+                    
+                    const agendaData = DATA_JADWAL_GLOBAL.find(a => a.id === (item.agenda || item.acara));
+                    const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal, agendaData?.toleransi);
+
+                    dataTable.push({
+                        "NO": index + 1,
+                        "WAKTU MASUK": new Date(msWaktu).toLocaleDateString('id-ID') + ' ' + new Date(msWaktu).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + ' WIB',
+                        "NAMA LENGKAP": item.nama || item.namaLengkap || '-',
+                        "DIVISI / NIM": item.divisi || item.kelas || '-',
+                        "KOORDINAT": item.lokasi || '-',
+                        "STATUS": statusObj.label
+                    });
+                });
+            } else {
+                MASTER_ANGGOTA_HIMA.forEach((m, index) => {
+                    const absen = DATA_REKAP_GLOBAL.find(a => (a.agenda || a.acara) === filter && (a.nama || a.namaLengkap || '').trim().toLowerCase() === m.nama.toLowerCase());
+                    let strWaktu = "Belum Presensi";
+                    let statusLabel = "Tidak Hadir";
+                    let lokasiStr = "-";
+
+                    if (absen) {
+                        let msWaktu = absen.timestamp || Date.now();
+                        if (typeof msWaktu === 'object' && msWaktu.toMillis) msWaktu = msWaktu.toMillis();
+                        strWaktu = new Date(msWaktu).toLocaleDateString('id-ID') + ' ' + new Date(msWaktu).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) + ' WIB';
+                        
+                        const statusObj = cekKeterlambatan(msWaktu, filteredAgenda?.jam, filteredAgenda?.tanggal, filteredAgenda?.toleransi);
+                        statusLabel = statusObj.label;
+                        lokasiStr = absen.lokasi || '-';
+                    }
+
+                    dataTable.push({
+                        "NO": index + 1,
+                        "WAKTU MASUK": strWaktu,
+                        "NAMA LENGKAP": m.nama,
+                        "DIVISI / NIM": m.divisi,
+                        "KOORDINAT": lokasiStr,
+                        "STATUS": statusLabel
+                    });
+                });
+            }
+
+            if(dataTable.length === 0) {
+                alert("Tidak ada data presensi yang tersedia untuk diexport!");
+                return;
+            }
+
+            const excelHeader = [
+                ["REKAPITULASI PRESENSI KEHADIRAN"],
+                ["HIMA PGSD Universitas Muhammadiyah Kuningan"],
+                ["Agenda Acara: " + (filter === 'SEMUA' ? 'Semua Agenda Registrasi' : filter)],
+                ["Dicetak pada: " + nowStr + " WIB"],
+                [] 
+            ];
+
+            const worksheet = XLSX.utils.aoa_to_sheet(excelHeader);
+            XLSX.utils.sheet_add_json(worksheet, dataTable, { origin: "A6" });
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Presensi");
+            
+            const cleanAcaraName = (filter === 'SEMUA' ? 'Semua_Agenda' : filter).replace(/[^a-zA-Z0-9_-]/g, '_');
+            XLSX.writeFile(workbook, `Rekap_Presensi_${cleanAcaraName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // EXPORT ASPIRASI KE EXCEL (.XLSX)
+        function exportAspirasiExcel() {
+            if(listAspirasiLokal.length === 0) {
+                alert("Belum ada data aspirasi untuk diexport!");
+                return;
+            }
+
+            const dataExport = listAspirasiLokal.map((item, index) => ({
+                "NO": index + 1,
+                "TANGGAL": new Date(item.timestamp).toLocaleString('id-ID'),
+                "PENGIRIM": item.anonim ? "RAHASIA (Anonim)" : item.nama,
+                "NIM": item.anonim ? "-" : (item.nim || '-'),
+                "ISI ASPIRASI": item.isi
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(dataExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Aspirasi Mahasiswa");
+            XLSX.writeFile(workbook, `Aspirasi_Mahasiswa_HIMA_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // COMPRESS GAMBAR
         document.getElementById('post-gambar').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if(file) {
@@ -460,27 +657,17 @@
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        
                         let max_size = 800;
                         let width = img.width;
                         let height = img.height;
-                        
                         if (width > height) {
-                            if (width > max_size) {
-                                height *= max_size / width;
-                                width = max_size;
-                            }
+                            if (width > max_size) { height *= max_size / width; width = max_size; }
                         } else {
-                            if (height > max_size) {
-                                width *= max_size / height;
-                                height = max_size;
-                            }
+                            if (height > max_size) { width *= max_size / height; height = max_size; }
                         }
-                        
                         canvas.width = width;
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        
                         base64ImageString = canvas.toDataURL('image/jpeg', 0.7);
                     };
                 };
@@ -488,9 +675,7 @@
             }
         });
 
-        // =========================================================
-        // HANDLER LOGIN
-        // =========================================================
+        // LOGIN HANDLER
         document.getElementById('form-login').addEventListener('submit', function(e) {
             e.preventDefault();
             const u = document.getElementById('user-admin').value.trim();
@@ -537,27 +722,24 @@
 
         document.getElementById('btn-logout').addEventListener('click', () => { location.reload(); });
 
-        // ================= GPS & JADWAL ABSENSI ENGINE =================
+        // AMBIL GPS
         document.getElementById('btn-dapatkan-gps-admin').addEventListener('click', () => {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((p) => {
                     document.getElementById('adm-lat-acara').value = p.coords.latitude;
                     document.getElementById('adm-lon-acara').value = p.coords.longitude;
                     alert("Koordinat GPS berhasil didapatkan!");
-                }, () => {
-                    alert("Akses GPS ditolak/tidak aktif di browser!");
-                });
-            } else {
-                alert("Browser Anda tidak mendukung geolokasi.");
-            }
+                }, () => { alert("Akses GPS ditolak/tidak aktif di browser!"); });
+            } else { alert("Browser Anda tidak mendukung geolokasi."); }
         });
 
-        // SIMPAN AGENDA TERMASUK TANGGAL ACARA
+        // SIMPAN AGENDA
         document.getElementById('form-jadwal-absen').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nama = document.getElementById('adm-nama-acara').value.trim();
             const tanggal = document.getElementById('adm-tgl-acara').value;
             const jam = document.getElementById('adm-jam-acara').value;
+            const toleransi = parseInt(document.getElementById('adm-toleransi-acara').value) || 0;
             const lat = document.getElementById('adm-lat-acara').value.trim();
             const lon = document.getElementById('adm-lon-acara').value.trim();
 
@@ -567,11 +749,12 @@
                 await setDoc(doc(db, "jadwalAbsen", nama), {
                     tanggal: tanggal,
                     jam: jam,
+                    toleransi: toleransi,
                     lat: lat,
                     lon: lon,
                     timestamp: Date.now()
                 });
-                alert(`Target agenda "${nama}" berhasil disimpan untuk tanggal ${tanggal}!`);
+                alert(`Target agenda "${nama}" berhasil disimpan!\n(Sesi dibuka max 1.5 jam setelah jam ${jam} WIB)`);
                 document.getElementById('form-jadwal-absen').reset();
             } catch (err) {
                 alert("Gagal menyimpan agenda: " + err.message);
@@ -579,26 +762,21 @@
         });
 
         async function hapusJadwalAcara(idAcara) {
-            if (confirm(`Yakin ingin menghapus target agenda "${idAcara}"?`)) {
+            if (confirm(`Yakin ingin menghapus agenda "${idAcara}"?`)) {
                 try {
                     await deleteDoc(doc(db, "jadwalAbsen", idAcara));
                     alert("Agenda berhasil dihapus!");
-                } catch (e) {
-                    alert("Gagal menghapus: " + e.message);
-                }
+                } catch (e) { alert("Gagal menghapus: " + e.message); }
             }
         }
 
-        // ================= FITUR ENGINE REKAP ABSENSI REALTIME & PRINT =================
+        // PRINT ENGINE
         function jalankanProsesCetak() {
             const cetakArea = document.getElementById('cetak-area');
             cetakArea.classList.remove('hidden');
-            
             setTimeout(() => {
                 window.print();
-                setTimeout(() => {
-                    cetakArea.classList.add('hidden');
-                }, 500);
+                setTimeout(() => { cetakArea.classList.add('hidden'); }, 500);
             }, 150);
         }
 
@@ -615,47 +793,58 @@
             
             const namaAgenda = item.agenda || item.acara || '-';
             const agendaData = DATA_JADWAL_GLOBAL.find(a => a.id === namaAgenda);
-            const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal);
+            const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal, agendaData?.toleransi);
 
             const tglFull = new Date(msWaktu).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' }) + " WIB";
             const namaPeserta = item.nama || item.namaLengkap || '-';
             const divisiPeserta = item.divisi || item.kelas || '-';
             const koordinat = item.lokasi || '-';
+            const tglSkrgIndo = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
 
             const areaCetak = document.getElementById('cetak-konten');
             areaCetak.innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h3 style="text-transform: uppercase; font-size: 14px; font-weight: bold; margin:0;">KARTU BUKTI PRESENSI MASUK</h3>
-                    <p style="font-size: 11px; margin-top: 4px; color: #475569;">HIMA PGSD Universitas Muhammadiyah Kuningan</p>
+                    <p style="font-size: 11px; margin-top: 4px; color: #475569;">HIMA PGSD Periode 2026-2027</p>
                 </div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 12px; line-height: 2;">
-                    <tr style="border-bottom: 1px solid #ccc;"><td style="width: 150px; font-weight: bold;">Nama Lengkap</td><td>: ${namaPeserta}</td></tr>
-                    <tr style="border-bottom: 1px solid #ccc;"><td style="font-weight: bold;">Departemen / Divisi</td><td>: ${divisiPeserta}</td></tr>
-                    <tr style="border-bottom: 1px solid #ccc;"><td style="font-weight: bold;">Agenda Acara</td><td>: ${namaAgenda}</td></tr>
-                    <tr style="border-bottom: 1px solid #ccc;"><td style="font-weight: bold;">Koordinat GPS</td><td>: ${koordinat}</td></tr>
-                    <tr style="border-bottom: 1px solid #ccc;"><td style="font-weight: bold;">Waktu Masuk</td><td>: ${tglFull}</td></tr>
-                    <tr style="border-bottom: 1px solid #ccc;"><td style="font-weight: bold;">Status Kehadiran</td><td style="color: ${statusObj.isTerlambat ? '#dc2626' : '#16a34a'}; font-weight: bold;">: ${statusObj.label}</td></tr>
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #000;">
+                    <tr style="border-bottom: 1px solid #000;"><td style="width: 150px; font-weight: bold; padding: 8px; border-right: 1px solid #000;">Nama Lengkap</td><td style="padding: 8px;">: ${namaPeserta}</td></tr>
+                    <tr style="border-bottom: 1px solid #000;"><td style="font-weight: bold; padding: 8px; border-right: 1px solid #000;">Divisi / Jabatan</td><td style="padding: 8px;">: ${divisiPeserta}</td></tr>
+                    <tr style="border-bottom: 1px solid #000;"><td style="font-weight: bold; padding: 8px; border-right: 1px solid #000;">Agenda Acara</td><td style="padding: 8px;">: ${namaAgenda}</td></tr>
+                    <tr style="border-bottom: 1px solid #000;"><td style="font-weight: bold; padding: 8px; border-right: 1px solid #000;">Koordinat GPS</td><td style="padding: 8px;">: ${koordinat}</td></tr>
+                    <tr style="border-bottom: 1px solid #000;"><td style="font-weight: bold; padding: 8px; border-right: 1px solid #000;">Waktu Masuk</td><td style="padding: 8px;">: ${tglFull}</td></tr>
+                    <tr><td style="font-weight: bold; padding: 8px; border-right: 1px solid #000;">Status Kehadiran</td><td style="color: ${statusObj.isTerlambat ? '#dc2626' : '#16a34a'}; font-weight: bold; padding: 8px;">: ${statusObj.label}</td></tr>
                 </table>
-                <div style="margin-top: 40px; text-align: right; font-size: 11px;">
-                    <p>Kuningan, ${new Date().toLocaleDateString('id-ID', {dateStyle: 'long'})}</p>
-                    <br><br><br>
-                    <p style="font-weight: bold; text-decoration: underline;">Panitia HIMA PGSD</p>
+
+                <!-- LEMBAR TANDA TANGAN SURAT HIMA PGSD -->
+                <div style="margin-top: 40px; display: flex; justify-content: flex-end; text-align: center; font-size: 11px; page-break-inside: avoid;">
+                    <div style="width: 250px;">
+                        <p style="margin: 0;">Kuningan, ${tglSkrgIndo}</p>
+                        <p style="font-weight: bold; margin: 4px 0 0 0;">Pengurus HIMA PGSD</p>
+                        <p style="font-size: 10px; color: #555; margin: 2px 0 0 0;">Universitas Muhammadiyah Kuningan</p>
+                        <div style="height: 60px;"></div>
+                        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( .................................................... )</p>
+                        <p style="font-size: 10px; margin: 2px 0 0 0; color: #444;">NIM / Jabatan</p>
+                    </div>
                 </div>
             `;
             jalankanProsesCetak();
         }
 
+        // PRINT REKAP PRESENSI DENGAN TABEL BERGARIS, HEADER CENTER & FORMAT TTD SURAT KUNINGAN
         function cetakSemuaAbsen() {
             const filter = document.getElementById('filter-agenda-rekap').value;
             const filteredData = DATA_REKAP_GLOBAL.filter(item => filter === "SEMUA" || (item.agenda || item.acara) === filter);
 
             if (filteredData.length === 0) { 
-                alert("Tidak ada data presensi yang sesuai untuk dicetak!"); 
+                alert("Tidak ada data presensi untuk dicetak!"); 
                 return; 
             }
 
             const areaCetak = document.getElementById('cetak-konten');
-            const isSemuaAgenda = (filter === "SEMUA");
+            const now = new Date();
+            const wktCetakStr = now.toLocaleDateString('id-ID') + ', ' + now.toLocaleTimeString('id-ID') + ' WIB';
+            const tglSkrgIndo = now.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
 
             let barisTabel = "";
             filteredData.forEach((item, index) => {
@@ -664,76 +853,65 @@
                     if (typeof item.timestamp === 'number') msWaktu = item.timestamp;
                     else if (item.timestamp.toMillis) msWaktu = item.timestamp.toMillis();
                     else if (typeof item.timestamp === 'string') msWaktu = new Date(item.timestamp).getTime() || Date.now();
-                } else if (item.waktu) {
-                    msWaktu = new Date(item.waktu).getTime() || Date.now();
                 }
 
-                const wkt = new Date(msWaktu).toLocaleDateString('id-ID', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric' 
-                }) + " " + new Date(msWaktu).toLocaleTimeString('id-ID', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-
+                const d = new Date(msWaktu);
+                const wktFormatted = `${d.toLocaleDateString('id-ID', {day:'2-digit', month:'2-digit', year:'numeric'})} ${d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} WIB`;
                 const namaAgenda = item.agenda || item.acara || '-';
                 const agendaData = DATA_JADWAL_GLOBAL.find(a => a.id === namaAgenda);
-                const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal);
+                const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal, agendaData?.toleransi);
 
                 const namaPeserta = item.nama || item.namaLengkap || '-';
                 const divisiPeserta = item.divisi || item.kelas || '-';
                 const koordinat = item.lokasi || '-';
 
                 barisTabel += `
-                    <tr style="border-bottom: 1px solid #94a3b8;">
-                        <td style="padding: 8px 6px; border: 1px solid #64748b; text-align: center; font-weight: 600;">${index + 1}</td>
-                        <td style="padding: 8px 6px; border: 1px solid #64748b; font-family: monospace;">${wkt} WIB</td>
-                        <td style="padding: 8px 6px; border: 1px solid #64748b; font-weight: 600; font-size: 11px;">${namaPeserta}</td>
-                        <td style="padding: 8px 6px; border: 1px solid #64748b;">${divisiPeserta}</td>
-                        ${isSemuaAgenda ? `<td style="padding: 8px 6px; border: 1px solid #64748b;">${namaAgenda}</td>` : ''}
-                        <td style="padding: 8px 6px; border: 1px solid #64748b; text-align: center; font-family: monospace; font-size: 10px;">${koordinat}</td>
-                        <td style="padding: 8px 6px; border: 1px solid #64748b; text-align: center; font-weight: bold; color: ${statusObj.isTerlambat ? '#dc2626' : '#16a34a'};">${statusObj.label}</td>
+                    <tr style="border-bottom: 1px solid #000;">
+                        <td style="padding: 6px; text-align: center; border-right: 1px solid #000;">${index + 1}</td>
+                        <td style="padding: 6px; text-align: center; border-right: 1px solid #000;">${wktFormatted}</td>
+                        <td style="padding: 6px; font-weight: 600; border-right: 1px solid #000;">${namaPeserta}</td>
+                        <td style="padding: 6px; border-right: 1px solid #000;">${divisiPeserta}</td>
+                        <td style="padding: 6px; font-family: monospace; font-size: 10px; text-align: center; border-right: 1px solid #000;">${koordinat}</td>
+                        <td style="padding: 6px; text-align: center; font-weight: bold; color: ${statusObj.isTerlambat ? '#dc2626' : '#16a34a'};">${statusObj.label}</td>
                     </tr>
                 `;
             });
 
             areaCetak.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h2 style="font-weight: bold; font-size: 16px; text-transform: uppercase; margin: 0; letter-spacing: 0.5px;">REKAPITULASI PRESENSI KEHADIRAN</h2>
-                    <p style="font-size: 12px; margin: 4px 0 0 0; color: #334155;">HIMA PGSD Universitas Muhammadiyah Kuningan</p>
-                    <p style="font-size: 11px; margin: 6px 0 0 0; font-weight: bold; color: #0284c7;">
-                        Agenda Acara: ${filter === 'SEMUA' ? 'Semua Agenda Registrasi' : filter}
-                    </p>
-                    <p style="font-size: 10px; margin: 2px 0 0 0; color: #64748b;">Dicetak pada: ${new Date().toLocaleString('id-ID')} WIB</p>
+                <div style="margin-bottom: 15px; text-align: center;">
+                    <h2 style="font-weight: bold; font-size: 15px; text-transform: uppercase; margin: 0; color: #000;">REKAPITULASI PRESENSI KEHADIRAN</h2>
+                    <p style="font-size: 12px; margin: 3px 0 0 0; color: #111; font-weight: 600;">HIMA PGSD Universitas Muhammadiyah Kuningan</p>
+                    <p style="font-size: 11px; margin: 4px 0 0 0;">Agenda Acara: <strong>${filter === 'SEMUA' ? 'Semua Agenda Registrasi' : filter}</strong></p>
+                    <p style="font-size: 10px; margin: 2px 0 0 0; color: #555;">Dicetak pada: ${wktCetakStr}</p>
                 </div>
 
-                <table style="width: 100%; border-collapse: collapse; font-size: 11px; color: #0f172a; border: 1px solid #64748b;">
+                <!-- TABEL CETAK DALAM KOTAK RAPIH & HEADER RATA TENGAH -->
+                <table style="width: 100%; border-collapse: collapse; border: 1.5px solid #000; font-size: 11px; color: #000; margin-bottom: 30px;">
                     <thead>
-                        <tr style="background-color: #f1f5f9; text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px;">
-                            <th style="padding: 8px 4px; border: 1px solid #64748b; width: 30px; text-align: center;">No</th>
-                            <th style="padding: 8px 6px; border: 1px solid #64748b; width: 120px; text-align: left;">Waktu Masuk</th>
-                            <th style="padding: 8px 6px; border: 1px solid #64748b; text-align: left;">Nama Lengkap</th>
-                            <th style="padding: 8px 6px; border: 1px solid #64748b; width: 110px; text-align: left;">Divisi / NIM</th>
-                            ${isSemuaAgenda ? `<th style="padding: 8px 6px; border: 1px solid #64748b; text-align: left;">Agenda Acara</th>` : ''}
-                            <th style="padding: 8px 6px; border: 1px solid #64748b; width: 100px; text-align: center;">Koordinat</th>
-                            <th style="padding: 8px 6px; border: 1px solid #64748b; width: 80px; text-align: center;">Status</th>
+                        <tr style="border-bottom: 1.5px solid #000; background-color: #f1f5f9; text-transform: uppercase; font-size: 10px; font-weight: bold;">
+                            <th style="padding: 8px; width: 35px; text-align: center; border-right: 1px solid #000;">NO</th>
+                            <th style="padding: 8px; width: 130px; text-align: center; border-right: 1px solid #000;">WAKTU MASUK</th>
+                            <th style="padding: 8px; text-align: center; border-right: 1px solid #000;">NAMA LENGKAP</th>
+                            <th style="padding: 8px; text-align: center; border-right: 1px solid #000;">DIVISI / NIM</th>
+                            <th style="padding: 8px; width: 130px; text-align: center; border-right: 1px solid #000;">KOORDINAT</th>
+                            <th style="padding: 8px; width: 90px; text-align: center;">STATUS</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${barisTabel}
-                    </tbody>
+                    <tbody>${barisTabel}</tbody>
                 </table>
 
-                <div style="margin-top: 30px; display: flex; justify-content: flex-end; font-size: 11px;">
-                    <div style="text-align: center; width: 200px;">
-                        <p style="margin: 0;">Kuningan, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                        <p style="margin: 2px 0 60px 0; font-weight: bold;">Pengurus HIMA PGSD</p>
-                        <p style="margin: 0; font-weight: bold; text-decoration: underline;">(..........................................)</p>
+                <!-- TANDA TANGAN DENGAN FORMAT SURAT KUNINGAN HIMA PGSD -->
+                <div style="display: flex; justify-content: flex-end; text-align: center; font-size: 11px; page-break-inside: avoid;">
+                    <div style="width: 250px;">
+                        <p style="margin: 0;">Kuningan, ${tglSkrgIndo}</p>
+                        <p style="font-weight: bold; margin: 4px 0 0 0;">Pengurus HIMA PGSD</p>
+                        <p style="font-size: 10px; color: #555; margin: 2px 0 0 0;">Universitas Muhammadiyah Kuningan</p>
+                        <div style="height: 65px;"></div>
+                        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( .................................................... )</p>
+                        <p style="font-size: 10px; margin: 2px 0 0 0; color: #444;">NIM / Jabatan</p>
                     </div>
                 </div>
             `;
-
             jalankanProsesCetak();
         }
 
@@ -750,7 +928,7 @@
 
             const namaAgenda = item.agenda || item.acara || '-';
             const agendaData = DATA_JADWAL_GLOBAL.find(a => a.id === namaAgenda);
-            const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal);
+            const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal, agendaData?.toleransi);
 
             const teksWA = `*KONFIRMASI PRESENSI MAHASISWA (HIMA PGSD)*\n\n` +
                            `📌 *Agenda:* ${namaAgenda}\n` +
@@ -765,7 +943,7 @@
         }
 
         async function hapusDataAbsensi(idDoc, targetKoleksi = "kehadiranAbsen") {
-            if(confirm("Yakin ingin menghapus record presensi ini dari database cloud?")) {
+            if(confirm("Yakin ingin menghapus record presensi ini?")) {
                 try {
                     await deleteDoc(doc(db, targetKoleksi, idDoc));
                     alert("Data Kehadiran Berhasil Dihapus!");
@@ -773,7 +951,7 @@
             }
         }
 
-        // ================= FITUR ENGINE ASPIRASI =================
+        // ASPIRASI
         function muatDaftarAspirasi() {
             onSnapshot(query(collection(db, "aspirasi"), orderBy("timestamp", "desc")), (snapshot) => {
                 listAspirasiLokal = [];
@@ -788,7 +966,7 @@
                 });
 
                 if(listAspirasiLokal.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Belum ada data aspirasi mahasiswa masuk.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">Belum ada data aspirasi masuk.</td></tr>`;
                     return;
                 }
 
@@ -802,9 +980,9 @@
                             <td class="p-3 font-semibold text-slate-200">${namaPengirim}</td>
                             <td class="p-3 text-slate-200 whitespace-pre-line">${item.isi}</td>
                             <td class="p-3 flex flex-wrap justify-center gap-1.5">
-                                <button onclick="cetakAspirasi(${index})" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-solid fa-print"></i> Cetak</button>
-                                <button onclick="bagikanAspirasi(${index})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-brands fa-whatsapp"></i> Share</button>
-                                <button onclick="hapusAspirasi('${item.id}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[10px] font-bold transition-all"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="cetakAspirasi(${index})" class="bg-blue-600 hover:bg-blue-500 text-white px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-print"></i> Cetak</button>
+                                <button onclick="bagikanAspirasi(${index})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded text-[10px] font-bold"><i class="fa-brands fa-whatsapp"></i> Share</button>
+                                <button onclick="hapusAspirasi('${item.id}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2 py-1 rounded text-[10px] font-bold"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -816,18 +994,31 @@
             const item = listAspirasiLokal[idx];
             if(!item) return;
             const tgl = new Date(item.timestamp).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
-            const pengirim = item.anonim ? "RAHASIA (Anonimitas Terjaga)" : `${item.nama} (NIM: ${item.nim || '-'})`;
+            const pengirim = item.anonim ? "RAHASIA (Anonim)" : `${item.nama} (NIM: ${item.nim || '-'})`;
+            const tglSkrgIndo = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
 
             const areaCetak = document.getElementById('cetak-konten');
             areaCetak.innerHTML = `
                 <div style="line-height: 1.6;">
                     <h3 style="text-align: center; margin-bottom: 20px; font-weight: bold;">SURAT ASPIRASI MAHASISWA</h3>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                        <tr><td style="width: 120px; font-weight: bold; padding: 4px 0;">Hari / Tanggal</td><td style="padding: 4px 0;">: ${tgl} WIB</td></tr>
-                        <tr><td style="font-weight: bold; padding: 4px 0;">Identitas</td><td style="padding: 4px 0;">: ${pengirim}</td></tr>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #000;">
+                        <tr style="border-bottom: 1px solid #000;"><td style="width: 140px; font-weight: bold; padding: 6px 10px; border-right: 1px solid #000;">Hari / Tanggal</td><td style="padding: 6px 10px;">: ${tgl} WIB</td></tr>
+                        <tr><td style="font-weight: bold; padding: 6px 10px; border-right: 1px solid #000;">Identitas</td><td style="padding: 6px 10px;">: ${pengirim}</td></tr>
                     </table>
-                    <div style="border: 1px solid #1e293b; padding: 15px; border-radius: 6px; background-color: #f8fafc; min-height: 150px; white-space: pre-line;">
+                    <div style="border: 1px solid #000; padding: 15px; background-color: #fff; min-height: 150px; white-space: pre-line;">
                         <strong>Pernyataan / Aspirasi:</strong><br><br>${item.isi}
+                    </div>
+                </div>
+
+                <!-- TANDA TANGAN DENGAN FORMAT SURAT KUNINGAN HIMA PGSD -->
+                <div style="margin-top: 40px; display: flex; justify-content: flex-end; text-align: center; font-size: 11px; page-break-inside: avoid;">
+                    <div style="width: 250px;">
+                        <p style="margin: 0;">Kuningan, ${tglSkrgIndo}</p>
+                        <p style="font-weight: bold; margin: 4px 0 0 0;">Pengurus HIMA PGSD</p>
+                        <p style="font-size: 10px; color: #555; margin: 2px 0 0 0;">Universitas Muhammadiyah Kuningan</p>
+                        <div style="height: 65px;"></div>
+                        <p style="font-weight: bold; text-decoration: underline; margin: 0;">( .................................................... )</p>
+                        <p style="font-size: 10px; margin: 2px 0 0 0; color: #444;">NIM / Jabatan</p>
                     </div>
                 </div>
             `;
@@ -840,25 +1031,17 @@
             const tgl = new Date(item.timestamp).toLocaleDateString('id-ID', { dateStyle: 'long' });
             const pengirim = item.anonim ? "*ANONIM*" : `*${item.nama}* (${item.nim || '-'})`;
 
-            const teksWA = `*ASPIRASI MAHASISWA HIMA PGSD*\n` +
-                           `📅 *Tanggal:* ${tgl}\n` +
-                           `👤 *Pengirim:* ${pengirim}\n\n` +
-                           `💬 *Pesan Aspirasi:*\n"${item.isi}"`;
-
-            const urlShare = `https://api.whatsapp.com/send?text=${encodeURIComponent(teksWA)}`;
-            window.open(urlShare, '_blank');
+            const teksWA = `*ASPIRASI MAHASISWA HIMA PGSD*\n📅 *Tanggal:* ${tgl}\n👤 *Pengirim:* ${pengirim}\n\n💬 *Pesan Aspirasi:*\n"${item.isi}"`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(teksWA)}`, '_blank');
         }
 
         async function hapusAspirasi(id) {
-            if(confirm("Hapus permanen arsip aspirasi mahasiswa ini dari cloud server?")) {
-                try {
-                    await deleteDoc(doc(db, "aspirasi", id));
-                    alert("Aspirasi Dihapus!");
-                } catch(e) { alert("Gagal: " + e.message); }
+            if(confirm("Hapus permanen aspirasi ini?")) {
+                try { await deleteDoc(doc(db, "aspirasi", id)); alert("Aspirasi Dihapus!"); } catch(e) { alert("Gagal: " + e.message); }
             }
         }
 
-        // ================= FITUR MANAJEMEN BERITA / PUBLIKASI =================
+        // KONTEN PUBLIKASI
         function muatDaftarKontenTabel() {
             onSnapshot(query(collection(db, "publikasi"), orderBy("timestamp", "desc")), (snapPublikasi) => {
                 onSnapshot(query(collection(db, "videoSosmed"), orderBy("timestamp", "desc")), (snapVideo) => {
@@ -885,7 +1068,7 @@
                     listBeritaLokal.sort((a, b) => b.timestamp - a.timestamp);
 
                     if(listBeritaLokal.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-slate-400">Belum ada konten diterbitkan di server cloud.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-slate-400">Belum ada konten diterbitkan.</td></tr>`;
                         return;
                     }
 
@@ -903,8 +1086,8 @@
                                 <td class="p-3 font-medium text-white max-w-xs truncate">${item.judul}</td>
                                 <td class="p-3"><span class="px-2 py-0.5 border rounded text-[10px] font-bold tracking-wider ${badgeColor}">${penempatanMenu}</span></td>
                                 <td class="p-3 flex justify-center gap-2">
-                                    <button onclick="siapEditBerita(${index})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold transition-colors">Edit</button>
-                                    <button onclick="hapusBerita('${item.id}', '${item.sumberKoleksi}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded text-[11px] font-bold transition-colors">Hapus</button>
+                                    <button onclick="siapEditBerita(${index})" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 py-1 rounded text-[11px] font-bold">Edit</button>
+                                    <button onclick="hapusBerita('${item.id}', '${item.sumberKoleksi}')" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded text-[11px] font-bold">Hapus</button>
                                 </td>
                             </tr>
                         `;
@@ -961,13 +1144,12 @@
                 if (!embedCode) { alert("Harap masukkan Kode Embed Video!"); return; }
                 if (!judul) { judul = "Video HIMA"; }
             } else {
-                if (!judul || !isi) { alert("Harap lengkapi semua data formulir!"); return; }
+                if (!judul || !isi) { alert("Harap lengkapi formulir!"); return; }
             }
 
-            if(confirm("Apakah Anda yakin dengan penulisan data publikasi ini?")) {
+            if(confirm("Apakah Anda yakin ingin menerbitkan data publikasi ini?")) {
                 try {
                     document.getElementById('btn-submit-konten').disabled = true;
-                    
                     if (kategori === "VideoSosmed") {
                         const videoPayload = { judul: judul, embedCode: embedCode, platform: "YouTube", timestamp: Date.now() };
                         if(editId === "") { await addDoc(collection(db, "videoSosmed"), videoPayload); } 
@@ -991,37 +1173,25 @@
         });
 
         async function hapusBerita(id, targetKoleksi) {
-            if(confirm("Apakah Anda yakin ingin menghapus data ini dari Firestore Cloud?")) {
-                try {
-                    await deleteDoc(doc(db, targetKoleksi, id));
-                    alert("Konten Berhasil Dihapus!");
-                } catch(e) { alert("Gagal menghapus: " + e.message); }
+            if(confirm("Hapus data publikasi ini dari Cloud Server?")) {
+                try { await deleteDoc(doc(db, targetKoleksi, id)); alert("Konten Dihapus!"); } catch(e) { alert("Gagal menghapus: " + e.message); }
             }
         }
 
-        // ================= FITUR MANAJEMEN KEUANGAN =================
+        // KEUANGAN
         document.getElementById('btn-update-keuangan').addEventListener('click', async () => {
             const pem = parseInt(document.getElementById('inp-pemasukan').value) || 0;
             const peng = parseInt(document.getElementById('inp-pengeluaran').value) || 0;
-            
             try {
-                await updateDoc(doc(db, "keuangan", "ringkasan"), { 
-                    pemasukan: increment(pem), 
-                    pengeluaran: increment(peng)
-                });
-                alert("Data Keuangan Berhasil Ditambahkan (Akumulatif)!");
+                await updateDoc(doc(db, "keuangan", "ringkasan"), { pemasukan: increment(pem), pengeluaran: increment(peng) });
+                alert("Data Keuangan Berhasil Ditambahkan!");
                 document.getElementById('form-keuangan').reset();
             } catch(e) { 
                 try {
-                    await setDoc(doc(db, "keuangan", "ringkasan"), { 
-                        pemasukan: pem, 
-                        pengeluaran: peng 
-                    });
-                    alert("Data Keuangan Awal Berhasil Dibuat!");
+                    await setDoc(doc(db, "keuangan", "ringkasan"), { pemasukan: pem, pengeluaran: peng });
+                    alert("Data Keuangan Awal Dibuat!");
                     document.getElementById('form-keuangan').reset();
-                } catch(err) {
-                    alert("Gagal memproses data: " + err.message); 
-                }
+                } catch(err) { alert("Gagal: " + err.message); }
             }
         });
 
@@ -1033,18 +1203,12 @@
                     const pem = parseInt(document.getElementById('inp-pemasukan').value) || 0;
                     const peng = parseInt(document.getElementById('inp-pengeluaran').value) || 0;
 
-                    if (confirm(`Apakah Anda yakin ingin MENGGANTI angka pemasukan menjadi Rp ${pem.toLocaleString('id-ID')} dan pengeluaran menjadi Rp ${peng.toLocaleString('id-ID')}?`)) {
+                    if (confirm(`Setel ulang saldo keuangan ke: Pemasukan Rp ${pem.toLocaleString('id-ID')} & Pengeluaran Rp ${peng.toLocaleString('id-ID')}?`)) {
                         try {
-                            await setDoc(doc(db, "keuangan", "ringkasan"), { 
-                                pemasukan: pem, 
-                                pengeluaran: peng,
-                                lastUpdate: Date.now()
-                            });
-                            alert("Data Keuangan Berhasil Diperbarui Secara Langsung!");
+                            await setDoc(doc(db, "keuangan", "ringkasan"), { pemasukan: pem, pengeluaran: peng, lastUpdate: Date.now() });
+                            alert("Data Keuangan Diperbarui!");
                             document.getElementById('form-keuangan').reset();
-                        } catch (err) {
-                            alert("Gagal memperbarui keuangan: " + err.message);
-                        }
+                        } catch (err) { alert("Gagal: " + err.message); }
                     }
                 });
             }
@@ -1067,7 +1231,7 @@
             });
         }
 
-        // ================= OTOMATISASI REALTIME MONITORING ABSENSI =================
+        // REALTIME ABSENSI & MONITORING
         function inisialisasiFiturAbsenOtomatis() {
             monitorJadwalAcaraLive();
             monitorKehadiranLive();
@@ -1089,7 +1253,7 @@
                 if (selectFilter) selectFilter.innerHTML = '<option value="SEMUA" class="bg-slate-900 text-white">-- Semua Agenda --</option>';
 
                 if (snapshot.empty) {
-                    if (tabelJadwal) tabelJadwal.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-slate-400 italic">Belum ada target agenda absensi aktif.</td></tr>';
+                    if (tabelJadwal) tabelJadwal.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-slate-400 italic">Belum ada target agenda absensi aktif.</td></tr>';
                     renderTabelRekap();
                     return;
                 }
@@ -1101,7 +1265,7 @@
 
                     const statusAgenda = cekStatusAgendaAktif(d.tanggal, d.jam);
                     const badgeAgendaStatus = statusAgenda.isExpired
-                        ? `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded font-bold text-[10px]">Kadaluarsa</span>`
+                        ? `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded font-bold text-[10px]">Sesi Ditutup (>1.5 Jam)</span>`
                         : `<span class="bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2 py-0.5 rounded font-bold text-[10px]">Aktif</span>`;
 
                     if (tabelJadwal) {
@@ -1110,6 +1274,7 @@
                                 <td class="p-2.5 font-bold text-white">${idAcara}</td>
                                 <td class="p-2.5 text-slate-300 font-semibold">${formatTanggalIndo(d.tanggal)}</td>
                                 <td class="p-2.5 font-semibold text-amber-300 font-mono">${d.jam || '--:--'} WIB</td>
+                                <td class="p-2.5 font-bold text-center text-amber-400 font-mono">+${d.toleransi || 0} Mnt</td>
                                 <td class="p-2.5 font-mono text-[11px] text-slate-300">${d.lat || '0'}, ${d.lon || '0'}</td>
                                 <td class="p-2.5 text-center">${badgeAgendaStatus}</td>
                                 <td class="p-2.5 text-center">
@@ -1209,14 +1374,14 @@
                                         <i class="fa-solid fa-calendar-check mr-1"></i>Agenda
                                     </span>
                                     <span class="${statusAgenda.isExpired ? 'bg-rose-950/80 text-rose-300 border-rose-500/50' : 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'} text-[11px] font-mono font-bold px-2 py-0.5 rounded border">
-                                        ${statusAgenda.isExpired ? 'Kadaluarsa' : 'Aktif'} (${totalPesertaAbsen} Anggota)
+                                        ${statusAgenda.isExpired ? 'Sesi Ditutup' : 'Aktif'} (${totalPesertaAbsen}/${MASTER_ANGGOTA_HIMA.length} Anggota)
                                     </span>
                                 </div>
                                 <h4 class="text-base font-bold text-white mb-1.5">${agenda.id}</h4>
                                 <div class="text-xs text-slate-300 space-y-1 mb-3">
                                     <p class="flex items-center gap-1.5"><i class="fa-solid fa-calendar text-sky-400 w-4"></i> Hari/Tgl: ${formatTanggalIndo(agenda.tanggal)}</p>
-                                    <p class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-amber-400 w-4"></i> Target Jam: ${agenda.jam || '--:--'} WIB</p>
-                                    <p class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rose-400 w-4"></i> GPS: ${agenda.lat || '0'}, ${agenda.lon || '0'}</p>
+                                    <p class="flex items-center gap-1.5"><i class="fa-solid fa-clock text-amber-400 w-4"></i> Waktu Kumpul: ${agenda.jam || '--:--'} WIB (+${agenda.toleransi || 0} Mnt Toleransi)</p>
+                                    <p class="flex items-center gap-1.5"><i class="fa-solid fa-hourglass-half text-rose-400 w-4"></i> Batas Maksimal Sesi: 1.5 Jam (90 Mnt)</p>
                                 </div>
                             </div>
                             <div class="pt-2 border-t border-slate-600/30 flex justify-end">
@@ -1232,10 +1397,63 @@
 
             } else {
                 const filteredData = DATA_REKAP_GLOBAL.filter(item => (item.agenda || item.acara) === filter);
+                const agendaData = DATA_JADWAL_GLOBAL.find(a => a.id === filter);
+
+                const listLengkap = MASTER_ANGGOTA_HIMA.map(m => {
+                    const absen = filteredData.find(a => (a.nama || a.namaLengkap || '').trim().toLowerCase() === m.nama.toLowerCase());
+                    if (absen) {
+                        let msWaktu = Date.now();
+                        if (absen.timestamp) {
+                            if (typeof absen.timestamp === 'number') msWaktu = absen.timestamp;
+                            else if (absen.timestamp.toMillis) msWaktu = absen.timestamp.toMillis();
+                            else if (typeof absen.timestamp === 'string') msWaktu = new Date(absen.timestamp).getTime() || Date.now();
+                        } else if (absen.waktu) {
+                            msWaktu = new Date(absen.waktu).getTime() || Date.now();
+                        }
+                        const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal, agendaData?.toleransi);
+
+                        const isEfektifHadir = !statusObj.isExpired;
+
+                        return {
+                            ...absen,
+                            namaMaster: m.nama,
+                            divisiMaster: m.divisi,
+                            statusKehadiran: statusObj.label,
+                            batasMenit: statusObj.batasMenit,
+                            isHadir: isEfektifHadir,
+                            msWaktu: msWaktu
+                        };
+                    } else {
+                        return {
+                            id: null,
+                            namaMaster: m.nama,
+                            divisiMaster: m.divisi,
+                            statusKehadiran: "Tidak Hadir",
+                            batasMenit: "--:--",
+                            isHadir: false,
+                            msWaktu: null,
+                            lokasi: '-'
+                        };
+                    }
+                });
+
+                const totalHadir = listLengkap.filter(x => x.isHadir).length;
+                const totalTidakHadir = listLengkap.filter(x => !x.isHadir).length;
+                
+                const cntSemua = document.getElementById('cnt-semua');
+                const cntHadir = document.getElementById('cnt-hadir');
+                const cntTidakHadir = document.getElementById('cnt-tidak-hadir');
+                if(cntSemua) cntSemua.innerText = listLengkap.length;
+                if(cntHadir) cntHadir.innerText = totalHadir;
+                if(cntTidakHadir) cntTidakHadir.innerText = totalTidakHadir;
+
+                let finalDisplay = listLengkap;
+                if (TAB_STATUS_AKTIF === 'HADIR') finalDisplay = listLengkap.filter(x => x.isHadir);
+                if (TAB_STATUS_AKTIF === 'TIDAK_HADIR') finalDisplay = listLengkap.filter(x => !x.isHadir);
 
                 let tableHtml = `
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-xs text-slate-300">Total Anggota Hadir: <strong class="text-amber-300">${filteredData.length}</strong></span>
+                        <span class="text-xs text-slate-300">Rekap Presensi: <strong class="text-emerald-400">${totalHadir} Hadir</strong> / <strong class="text-rose-400">${totalTidakHadir} Belum/Tidak Hadir</strong> (Total ${MASTER_ANGGOTA_HIMA.length} Pengurus)</span>
                         <button onclick="pilihAgenda('SEMUA')" class="bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs px-2.5 py-1 rounded-lg border border-amber-500/30 font-semibold transition-all">
                             &larr; Kembali ke Semua Agenda
                         </button>
@@ -1244,68 +1462,71 @@
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900/80 text-slate-200 border-b border-slate-600/40 uppercase font-semibold text-[11px]">
                                 <tr>
-                                    <th class="p-3 border-r border-slate-600/30 w-36">Waktu Masuk</th>
-                                    <th class="p-3 border-r border-slate-600/30">Nama Lengkap</th>
-                                    <th class="p-3 border-r border-slate-600/30 w-32">Divisi / NIM</th>
-                                    <th class="p-3 border-r border-slate-600/30 text-center w-28">Koordinat</th>
-                                    <th class="p-3 border-r border-slate-600/30 text-center w-28">Status</th>
-                                    <th class="p-3 w-44 text-center">Tindakan</th>
+                                    <th class="p-3 border-r border-slate-600/30 text-center w-12">NO</th>
+                                    <th class="p-3 border-r border-slate-600/30 w-36 text-center">WAKTU MASUK</th>
+                                    <th class="p-3 border-r border-slate-600/30 text-center">NAMA LENGKAP</th>
+                                    <th class="p-3 border-r border-slate-600/30 w-44 text-center">DIVISI / NIM</th>
+                                    <th class="p-3 border-r border-slate-600/30 text-center w-40">KOORDINAT</th>
+                                    <th class="p-3 border-r border-slate-600/30 text-center w-28">STATUS</th>
+                                    <th class="p-3 w-40 text-center">TINDAKAN</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-slate-950/20 divide-y divide-slate-700/30">
                 `;
 
-                if (filteredData.length === 0) {
+                if (finalDisplay.length === 0) {
                     tableHtml += `
                         <tr>
-                            <td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada data presensi anggota untuk agenda ini.</td>
+                            <td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada data anggota sesuai filter.</td>
                         </tr>
                     `;
                 } else {
-                    filteredData.forEach((item, index) => {
-                        let msWaktu = Date.now();
-                        if (item.timestamp) {
-                            if (typeof item.timestamp === 'number') msWaktu = item.timestamp;
-                            else if (item.timestamp.toMillis) msWaktu = item.timestamp.toMillis();
-                            else if (typeof item.timestamp === 'string') msWaktu = new Date(item.timestamp).getTime() || Date.now();
-                        } else if (item.waktu) {
-                            msWaktu = new Date(item.waktu).getTime() || Date.now();
+                    finalDisplay.forEach((item, index) => {
+                        let strWaktu = "--:--";
+                        let mapsUrl = "#";
+                        
+                        if (item.msWaktu) {
+                            const d = new Date(item.msWaktu);
+                            strWaktu = `${d.toLocaleDateString('id-ID', {day:'2-digit', month:'2-digit', year:'numeric'})} ${d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} WIB`;
+                            mapsUrl = item.lokasi ? `https://www.google.com/maps?q=${item.lokasi}` : '#';
                         }
 
-                        const strWaktu = new Date(msWaktu).toLocaleDateString('id-ID') + ' ' + new Date(msWaktu).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                        const mapsUrl = item.lokasi ? `https://www.google.com/maps?q=${item.lokasi}` : '#';
-                        const namaPeserta = item.nama || item.namaLengkap || '-';
-                        const divisiPeserta = item.divisi || item.kelas || '-';
-                        const koordinat = item.lokasi || '-';
-
-                        const namaAgenda = item.agenda || item.acara || filter;
-                        const agendaData = DATA_JADWAL_GLOBAL.find(a => a.id === namaAgenda);
-                        const statusObj = cekKeterlambatan(msWaktu, agendaData?.jam, agendaData?.tanggal);
-
-                        const badgeStatus = statusObj.isTerlambat 
-                            ? `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Terlambat</span>`
-                            : `<span class="bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fa-solid fa-circle-check mr-1"></i>Tepat Waktu</span>`;
+                        let badgeStatus = "";
+                        if (item.statusKehadiran === "Tepat Waktu") {
+                            badgeStatus = `<span class="bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fa-solid fa-circle-check mr-1"></i>Tepat Waktu</span>`;
+                        } else if (item.statusKehadiran === "Terlambat") {
+                            badgeStatus = `<span class="bg-amber-950/80 text-amber-300 border border-amber-500/50 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Terlambat</span>`;
+                        } else {
+                            badgeStatus = `<span class="bg-rose-950/80 text-rose-300 border border-rose-500/50 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fa-solid fa-circle-xmark mr-1"></i>Tidak Hadir</span>`;
+                        }
 
                         tableHtml += `
                             <tr class="hover:bg-slate-800/20 transition-colors">
-                                <td class="p-3 text-[11px] text-slate-300 font-mono">${strWaktu}</td>
-                                <td class="p-3 font-bold text-white">${namaPeserta}</td>
-                                <td class="p-3 text-slate-300">${divisiPeserta}</td>
-                                <td class="p-3 font-mono text-[11px] text-slate-300 text-center">${koordinat}</td>
+                                <td class="p-3 text-center text-slate-400 font-bold">${index + 1}</td>
+                                <td class="p-3 text-[11px] ${item.isHadir ? 'text-slate-300' : 'text-slate-500'} font-mono text-center">${strWaktu}</td>
+                                <td class="p-3 font-bold ${item.isHadir ? 'text-white' : 'text-slate-400'}">${item.namaMaster}</td>
+                                <td class="p-3 text-slate-300">${item.divisiMaster}</td>
+                                <td class="p-3 font-mono text-[11px] text-slate-300 text-center">${item.lokasi || '-'}</td>
                                 <td class="p-3 text-center">${badgeStatus}</td>
                                 <td class="p-3 flex items-center justify-center gap-1.5">
-                                    <a href="${mapsUrl}" target="_blank" class="bg-sky-600/30 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all flex items-center gap-1">
-                                        <i class="fa-solid fa-map-location-dot"></i> Maps
-                                    </a>
-                                    <button onclick="cetakAbsenPeserta(${index})" class="bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all">
-                                        <i class="fa-solid fa-print"></i>
-                                    </button>
-                                    <button onclick="bagikanAbsenPeserta(${index})" class="bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all">
-                                        <i class="fa-brands fa-whatsapp"></i>
-                                    </button>
-                                    <button onclick="hapusDataAbsensi('${item.id}', '${item.koleksiAsal || 'kehadiranAbsen'}')" class="bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
+                                    ${item.isHadir ? `
+                                        <a href="${mapsUrl}" target="_blank" class="bg-sky-600/30 hover:bg-sky-600 text-sky-300 hover:text-white border border-sky-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all flex items-center gap-1">
+                                            <i class="fa-solid fa-map-location-dot"></i> Maps
+                                        </a>
+                                        <button onclick="cetakAbsenPeserta(${index})" class="bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all">
+                                            <i class="fa-solid fa-print"></i>
+                                        </button>
+                                        <button onclick="bagikanAbsenPeserta(${index})" class="bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all">
+                                            <i class="fa-brands fa-whatsapp"></i>
+                                        </button>
+                                        <button onclick="hapusDataAbsensi('${item.id}', '${item.koleksiAsal || 'kehadiranAbsen'}')" class="bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    ` : `
+                                        <button onclick="ingatkanAbsenWA('${item.namaMaster}', '${item.divisiMaster}')" class="bg-amber-600/30 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 px-2 py-1 rounded text-[10px] font-bold transition-all flex items-center gap-1">
+                                            <i class="fa-brands fa-whatsapp"></i> Ingatkan WA
+                                        </button>
+                                    `}
                                 </td>
                             </tr>
                         `;
